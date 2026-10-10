@@ -2,6 +2,7 @@
 
 import {ValueError} from './errors.js'
 import {floatRepr} from './numbers.js'
+import type {Range} from './range.js'
 
 export type Key<T> = ((item: T) => unknown) | null | undefined
 
@@ -155,9 +156,22 @@ export function equals(a: unknown, b: unknown): boolean {
     if (typeof a === 'number' && typeof b === 'number') {
         return Number.isNaN(a) && Number.isNaN(b)
     }
-    if ((typeof a === 'bigint' || typeof a === 'number') && (typeof b === 'bigint' || typeof b === 'number')) {
+    if (isNumeric(a) && isNumeric(b)) {
+        // True == 1 and 1n == 1, like Python's bool, int and float
+        a = typeof a === 'boolean' ? Number(a) : a
+        b = typeof b === 'boolean' ? Number(b) : b
+        if (a === b) {
+            return true
+        }
+        if (typeof a === 'number' && typeof b === 'number') {
+            return false
+        }
         // 1n == 1, like Python's int == float
-        return Number.isInteger(Number(a)) && Number.isInteger(Number(b)) && BigInt(a) === BigInt(b)
+        return (
+            Number.isInteger(Number(a)) &&
+            Number.isInteger(Number(b)) &&
+            BigInt(a as number | bigint) === BigInt(b as number | bigint)
+        )
     }
     if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
         return false
@@ -166,8 +180,9 @@ export function equals(a: unknown, b: unknown): boolean {
     if (typeof eq === 'function') {
         return eq.call(a, b)
     }
-    if (isRangeLike(a) && isRangeLike(b)) {
-        return equals(Array.from(a as Iterable<unknown>), Array.from(b as Iterable<unknown>))
+    if (isRange(a) && isRange(b)) {
+        // like CPython: compare the sequences without materializing them
+        return a.length === b.length && (a.length === 0 || (a.start === b.start && (a.length === 1 || a.step === b.step)))
     }
     if (Array.isArray(a) !== Array.isArray(b)) {
         return false
@@ -183,7 +198,15 @@ export function equals(a: unknown, b: unknown): boolean {
             return false
         }
         for (const [k, v] of a) {
-            if (!b.has(k) || !equals(v, b.get(k))) {
+            if (b.has(k)) {
+                if (!equals(v, b.get(k))) {
+                    return false
+                }
+                continue
+            }
+            // keys like [1, 2] (Python tuples) are compared by value
+            const match = Array.from(b.keys()).find((other) => typeof other === 'object' && equals(k, other))
+            if (match === undefined || !equals(v, b.get(match))) {
                 return false
             }
         }
@@ -194,7 +217,7 @@ export function equals(a: unknown, b: unknown): boolean {
             return false
         }
         for (const v of a) {
-            if (!b.has(v)) {
+            if (!b.has(v) && !(typeof v === 'object' && Array.from(b).some((other) => equals(v, other)))) {
                 return false
             }
         }
@@ -208,8 +231,12 @@ export function equals(a: unknown, b: unknown): boolean {
     return keysA.every((k) => Object.hasOwn(b, k) && equals((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]))
 }
 
-function isRangeLike(x: object): boolean {
-    return (x as {__range__?: boolean}).__range__ === true
+/**
+ * Whether x is a Range. Uses a marker instead of instanceof so ranges from
+ * another copy of the library (CommonJS vs ESM, or the <script> build) work.
+ */
+export function isRange(x: unknown): x is Range {
+    return x !== null && typeof x === 'object' && (x as {__range__?: boolean}).__range__ === true
 }
 
 /** Converts Python-style possibly-negative indices like PySlice_AdjustIndices. */

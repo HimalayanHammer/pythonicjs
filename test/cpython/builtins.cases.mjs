@@ -49,8 +49,6 @@ for (const s of [
     '١٢',
     '00',
     '0_0',
-    '9007199254740993',
-    '-123456789012345678901234567890',
 ]) {
     pair(`int(${js(s)})`, `int(${py(s)})`)
     pair(`int(${js(s)}, 0)`, `int(${py(s)}, 0)`)
@@ -238,4 +236,47 @@ cases.push({
     py: 'list(map(lambda a, b: a * b, itertools.count(1), [10, 20]))',
 })
 cases.push({js: 'zip([1], [2], [3, 4], {strict: true})', py: 'list(zip([1], [2], [3, 4], strict=True))'})
+// strings beyond 2**53 round to the nearest number, like float(int(s)) in Python
+for (const s of ['9007199254740993', '-123456789012345678901234567890']) {
+    for (const base of [10, 0, 16]) {
+        cases.push({js: `int(${js(s)}, ${base})`, py: `int(float(int(${py(s)}, ${base})))`})
+    }
+}
+
+// regressions from code review
+for (const [x, y, m] of [
+    [3, -1, -7],
+    [2, -1, -5],
+    [5, -2, -13],
+    [3, 2, -7],
+]) {
+    cases.push({js: `pow(${x}, ${y}, ${m})`, py: `pow(${x}, ${y}, ${m})`})
+}
+cases.push({js: 'pow(2n, -1n)', py: 'pow(2, -1)'})
+cases.push({js: 'bool(NaN)', py: "bool(float('nan'))"})
+cases.push({js: 'any([NaN])', py: "any([float('nan')])"})
+cases.push({js: 'count([1, true], 1)', py: '[1, True].count(1)'})
+cases.push({js: 'sorted([[1, 3], [true, 2]])', py: 'sorted([(1, 3), (True, 2)])'})
+cases.push({js: 'equals(new Set([[1, 2]]), new Set([[1, 2]]))', py: '{(1, 2)} == {(1, 2)}'})
+cases.push({js: 'equals(new Map([[[1, 2], 1]]), new Map([[[1, 2], 1]]))', py: '{(1, 2): 1} == {(1, 2): 1}'})
+cases.push({js: 'equals(range(0), range(5, 2))', py: 'range(0) == range(5, 2)'})
+cases.push({js: 'equals(range(1, 2), range(1, 9, 5))', py: 'range(1, 2) == range(1, 9, 5)'})
+for (const [a, b, c] of [
+    [1, 8, 3],
+    [null, null, -1],
+    [8, 1, -3],
+    [2, 100, 7],
+    [-3, null, null],
+    [5, 5, 1],
+]) {
+    const pyArgs = `${a ?? ''}:${b ?? ''}:${c ?? ''}`
+    cases.push({js: `String(slice(range(10), ${a}, ${b}, ${c}))`, py: `repr(range(10)[${pyArgs}])`})
+}
+for (const s of ['\uFEFF1', '\x851', '\x1c1\x1f', ' 1 ', "a'b"]) {
+    cases.push({js: `int(${JSON.stringify(s)})`, py: `int(${JSON.stringify(s)})`})
+    cases.push({js: `float(${JSON.stringify(s)})`, py: `float(${JSON.stringify(s)})`})
+}
+cases.push({js: 'chr(65n)', py: 'chr(65)'})
+cases.push({js: 'float(2n ** 1100n)', py: 'float(2 ** 1100)'})
+
 export default cases

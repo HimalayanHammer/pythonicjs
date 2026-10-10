@@ -101,7 +101,8 @@
     "format": "biome check --write .",
     "prepublishOnly": "npm run lint && npm test",
     "test:types": "tsc -p test/types/tsconfig.json",
-    "docs": "npm run build && cp dist/pythonicjs.global.min.js dist/pythonicjs.global.min.js.map docs/ && npx --yes serve docs"
+    "docs": "npm run build && cp dist/pythonicjs.global.min.js dist/pythonicjs.global.min.js.map docs/ && npx --yes serve docs",
+    "version": "node scripts/sync-version.mjs && git add jsr.json"
   },
   "engines": {
     "node": ">=20"

@@ -4,7 +4,6 @@
   "license": "MIT",
   "exports": {
     ".": "./src/index.ts",
-    "./global": "./src/global.ts",
     "./itertools": "./src/itertools.ts",
     "./collections": "./src/collections.ts",
     "./heapq": "./src/heapq.ts",
@@ -12,6 +11,7 @@
     "./functools": "./src/functools.ts"
   },
   "publish": {
-    "include": ["src", "README.md", "LICENSE.md", "CHANGELOG.md"]
+    "include": ["src", "README.md", "LICENSE.md", "CHANGELOG.md"],
+    "exclude": ["src/global.ts", "src/browser.ts"]
   }
 }

@@ -138,8 +138,8 @@ print(round(2.675, 2), '(2.675 is stored as 2.67499999...)')
 // Python 3.12+ uses compensated summation
 print(sum(Array(10).fill(0.1)), 'vs', [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1].reduce((a, b) => a + b))
 
-// big integers stay exact
-print(int('123456789012345678901234567890') * 2n)
+// BigInts stay exact
+print(int(2n ** 100n) * 3n, pow(2n, 100n, 1000000007n))
 print(pow(3, 200, 1000000007), hex(-255), bin(10))
 
 try {

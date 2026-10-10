@@ -22,9 +22,10 @@ writeFileSync(`${dist}/cjs/package.json`, '{"type": "commonjs"}\n')
 // type declarations (tsc also type-checks the source)
 execFileSync('npx', ['tsc', '-p', 'tsconfig.json'], {stdio: 'inherit'})
 
-// global declarations for `import 'pythonicjs/global'`
+// global declarations for `import 'pythonicjs/global'` (npm only: JSR doesn't
+// allow global augmentation, so its package has no global entry point)
 const {api} = await import(`../${dist}/esm/install.js`)
-const lines = Object.keys(api)
+const declarations = Object.keys(api)
     .sort()
     .map((name) =>
         // lib.dom declares print(): void, so merge an overload instead of redeclaring it
@@ -32,7 +33,7 @@ const lines = Object.keys(api)
     )
 writeFileSync(
     `${dist}/esm/global.d.ts`,
-    `import type * as py from './index.js'\n\ndeclare global {\n${lines.join('\n')}\n    var pythonicjs: Omit<typeof py, 'Range' | 'install'>\n}\n\nexport * from './index.js'\n`,
+    `import type * as py from './index.js'\n\ndeclare global {\n${declarations.join('\n')}\n    var pythonicjs: Omit<typeof py, 'Range' | 'install'>\n}\n\nexport * from './index.js'\n`,
 )
 
 for (const file of readdirSync(`${dist}/esm`).filter((f) => f.endsWith('.d.ts'))) {
@@ -46,7 +47,7 @@ for (const minify of [false, true]) {
         outfile: `${dist}/pythonicjs.global${minify ? '.min' : ''}.js`,
         bundle: true,
         format: 'iife',
-        target: 'es2020',
+        target: 'es2022',
         minify,
         keepNames: true,
         sourcemap: true,

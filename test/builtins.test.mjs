@@ -423,3 +423,45 @@ describe('review regressions', () => {
         expect(equals(/a/, /b/)).to.be.false
     })
 })
+
+describe('code review regressions', () => {
+    it('int keeps number types for numbers and strings, and BigInt for BigInt', () => {
+        expect(int(1e20) + 1).to.equal(1e20 + 1)
+        expect(typeof int('9'.repeat(20))).to.equal('number')
+        expect(int(2n ** 70n)).to.equal(2n ** 70n)
+        expect(round(5n)).to.equal(5n)
+    })
+
+    it('int error messages use repr like Python', () => {
+        expect(() => int("a'b")).to.throw(ValueError, `invalid literal for int() with base 10: "a'b"`)
+    })
+
+    it('equals on huge ranges is O(1)', () => {
+        expect(equals(range(3e15), range(3e15))).to.be.true
+        expect(equals(range(0, 3e15, 2), range(0, 3e15, 3))).to.be.false
+    })
+
+    it('ranges from another copy of the library still work', async () => {
+        const {createRequire} = await import('node:module')
+        const other = createRequire(import.meta.url)('pythonicjs')
+        expect(len(other.range(3))).to.equal(3)
+        expect(bool(other.range(0))).to.be.false
+    })
+
+    it('deepcopy keeps namedtuple cycles, Set subclasses and __deepcopy__', () => {
+        const P = namedtuple('P', 'a')
+        const x = P._make([[]])
+        x.a.push(x)
+        const y = deepcopy(x)
+        expect(y.a[0]).to.equal(y)
+        class Tags extends Set {}
+        expect(deepcopy(new Tags([1]))).to.be.instanceOf(Tags)
+        const custom = {__deepcopy__: () => 'custom'}
+        expect(deepcopy(custom)).to.equal('custom')
+    })
+
+    it('divmod keeps the sign of a float zero', () => {
+        expect(Object.is(divmod(-0.0, 1.5)[0], -0)).to.be.true
+        expect(Object.is(divmod(0, -5)[0], 0)).to.be.true
+    })
+})

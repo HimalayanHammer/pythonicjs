@@ -12,12 +12,14 @@ import {
     isInteger,
     isIterable,
     isPlainObject,
+    isRange,
     type Key,
+    stringRepr,
     toArray,
     typeName,
 } from './internal.js'
 import {exactDecimal, roundDecimal} from './numbers.js'
-import {Range} from './range.js'
+import type {Range} from './range.js'
 
 type Mapping<V = unknown> = Record<string, V> | Map<unknown, V>
 
@@ -102,9 +104,14 @@ export function str(...object: unknown[]): string {
     return object.length === 0 ? '' : String(object[0])
 }
 
-function toSafeInteger(value: bigint): number {
-    const n = Number(value)
-    return Number.isSafeInteger(n) ? n + 0 : (value as unknown as number)
+/**
+ * The whitespace int() and float() ignore around a number: ASCII whitespace
+ * plus non-ASCII Unicode spaces. Unlike str.strip(), \x1c-\x1f are not ignored.
+ */
+const NUMBER_SPACE = '\\t\\n\\v\\f\\r \\x85\\xa0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000'
+
+function pyStrip(text: string): string {
+    return text.replace(new RegExp(`^[${NUMBER_SPACE}]+|[${NUMBER_SPACE}]+$`, 'g'), '')
 }
 
 /** Maps Unicode decimal digits (Arabic-Indic, Devanagari, fullwidth, ...) to ASCII, like Python. */
@@ -134,25 +141,27 @@ function parseIntegerDigits(text: string, base: number): bigint {
 
 /**
  * Python's int(). Truncates numbers toward zero and parses strings strictly
- * (int('12px') raises ValueError). Understands 0x/0o/0b prefixes, base 0
- * and underscores between digits. Results beyond Number.MAX_SAFE_INTEGER
- * are returned as exact BigInts.
+ * (int('12px') raises ValueError). Understands 0x/0o/0b prefixes, base 0,
+ * underscores between digits and Unicode digits. Strings beyond
+ * Number.MAX_SAFE_INTEGER round to the nearest number, like Number(); pass a
+ * BigInt to keep big integers exact.
  */
-export function int(value: unknown = 0, base = 10): number {
+export function int(value: bigint): bigint
+export function int(value?: number | string | boolean, base?: number): number
+export function int(value: unknown = 0, base = 10): number | bigint {
     if (typeof value === 'number') {
         if (!Number.isFinite(value)) {
             throw Number.isNaN(value)
                 ? new ValueError('cannot convert float NaN to integer')
                 : new OverflowError('cannot convert float infinity to integer')
         }
-        const truncated = Math.trunc(value) + 0
-        return Number.isSafeInteger(truncated) ? truncated : toSafeInteger(BigInt(truncated))
+        return Math.trunc(value) + 0
     }
     if (typeof value === 'boolean') {
         return value ? 1 : 0
     }
     if (typeof value === 'bigint') {
-        return toSafeInteger(value)
+        return value
     }
     if (typeof value !== 'string') {
         throw new TypeError(`int() argument must be a string, a bytes-like object or a real number, not '${typeName(value)}'`)
@@ -160,8 +169,8 @@ export function int(value: unknown = 0, base = 10): number {
     if (!Number.isInteger(base) || (base !== 0 && (base < 2 || base > 36))) {
         throw new ValueError('int() base must be >= 2 and <= 36, or 0')
     }
-    const invalid = new ValueError(`invalid literal for int() with base ${base}: '${value}'`)
-    let text = asciiDigits(value.trim()).toLowerCase()
+    const invalid = new ValueError(`invalid literal for int() with base ${base}: ${stringRepr(value)}`)
+    let text = asciiDigits(pyStrip(value)).toLowerCase()
     let negative = false
     if (text[0] === '+' || text[0] === '-') {
         negative = text[0] === '-'
@@ -187,7 +196,7 @@ export function int(value: unknown = 0, base = 10): number {
         throw invalid
     }
     const parsed = parseIntegerDigits(text.replace(/_/g, ''), radix)
-    return toSafeInteger(negative ? -parsed : parsed)
+    return Number(negative ? -parsed : parsed) + 0
 }
 
 /** Python's float(). Parses strings strictly and understands 'inf' and 'nan'. */
@@ -199,12 +208,16 @@ export function float(value: unknown = 0): number {
         return value ? 1 : 0
     }
     if (typeof value === 'bigint') {
-        return Number(value)
+        const n = Number(value)
+        if (!Number.isFinite(n)) {
+            throw new OverflowError('int too large to convert to float')
+        }
+        return n
     }
     if (typeof value !== 'string') {
         throw new TypeError(`float() argument must be a string or a real number, not '${typeName(value)}'`)
     }
-    const text = asciiDigits(value.trim()).toLowerCase()
+    const text = asciiDigits(pyStrip(value)).toLowerCase()
     if (/^[+-]?(inf|infinity)$/.test(text)) {
         return text[0] === '-' ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY
     }
@@ -216,7 +229,7 @@ export function float(value: unknown = 0): number {
     if (pattern.test(text)) {
         return Number.parseFloat(text.replace(/_/g, ''))
     }
-    throw new ValueError(`could not convert string to float: '${value}'`)
+    throw new ValueError(`could not convert string to float: ${stringRepr(value)}`)
 }
 
 /** Python truthiness: empty strings, arrays, objects, Maps and Sets are false. */
@@ -231,7 +244,7 @@ export function bool(object?: unknown): boolean {
         if (Array.isArray(object)) {
             return object.length > 0
         }
-        if (object instanceof Range) {
+        if (isRange(object)) {
             return object.length > 0
         }
         const custom = object as {__bool__?: () => boolean; __len__?: () => number}
@@ -245,6 +258,10 @@ export function bool(object?: unknown): boolean {
             return Object.keys(object).length > 0
         }
         return true
+    }
+    if (typeof object === 'number') {
+        // NaN is truthy in Python
+        return object !== 0
     }
     return Boolean(object)
 }
@@ -266,8 +283,9 @@ export function list<T>(iterable?: Iterable<T> | Record<string, unknown>): T[] {
 }
 
 /** The character for a Unicode code point. */
-export function chr(code: number): string {
+export function chr(code: number | bigint): string {
     checkInteger(code, 'chr')
+    code = Number(code)
     if (code < 0 || code > 0x10ffff) {
         throw new ValueError('chr() arg not in range(0x110000)')
     }
@@ -330,7 +348,8 @@ export function abs(x: number | bigint): number | bigint {
 }
 
 function modInverse(a: bigint, m: bigint): bigint {
-    let [oldR, r] = [((a % m) + m) % m, m < 0 ? -m : m]
+    const am = m < 0 ? -m : m
+    let [oldR, r] = [((a % am) + am) % am, am]
     let [oldS, s] = [BigInt(1), BigInt(0)]
     while (r !== BigInt(0)) {
         const q = oldR / r
@@ -352,6 +371,10 @@ export function pow(x: bigint, y: bigint, mod?: bigint): bigint
 export function pow(x: number | bigint, y: number | bigint, mod?: number | bigint): number | bigint {
     if (mod === undefined || mod === null) {
         if (typeof x === 'bigint' || typeof y === 'bigint') {
+            if (y < 0) {
+                // a negative integer power is a float in Python
+                return pow(Number(x), Number(y))
+            }
             return BigInt(x) ** BigInt(y)
         }
         if (x === 0 && y < 0) {
@@ -425,16 +448,19 @@ export function divmod(a: number | bigint, b: number | bigint): [number | bigint
             floordiv += 1
         }
     } else {
-        floordiv = x / y < 0 ? -0 : 0
+        floordiv = x / y < 0 || Object.is(x / y, -0) ? -0 : 0
     }
-    return [floordiv + 0, mod + 0]
+    // JavaScript can't tell 0 from 0.0: integral inputs are Python ints, which have no -0
+    return Number.isInteger(x) && Number.isInteger(y) ? [floordiv + 0, mod + 0] : [floordiv, mod]
 }
 
 /**
  * Python's round(): rounds half to even on the exact value, so round(2.5)
  * is 2 and round(2.675, 2) is 2.67 (2.675 is stored as 2.67499...).
  */
-export function round(number: number, ndigits?: number | null): number {
+export function round(number: bigint, ndigits?: number | null): bigint
+export function round(number: number, ndigits?: number | null): number
+export function round(number: number | bigint, ndigits?: number | null): number | bigint {
     if (typeof number === 'bigint') {
         return number
     }
@@ -639,7 +665,7 @@ export function len(object: unknown): number {
     if (typeof object === 'string') {
         return hasSurrogates(object) ? Array.from(object).length : object.length
     }
-    if (Array.isArray(object) || ArrayBuffer.isView(object) || object instanceof Range) {
+    if (Array.isArray(object) || ArrayBuffer.isView(object) || isRange(object)) {
         return (object as {length: number}).length
     }
     if (object instanceof Map || object instanceof Set) {
@@ -851,7 +877,7 @@ export function index(sequence: string | Iterable<unknown>, item: unknown): numb
         const i = sequence.indexOf(item as string)
         return i === -1 || !hasSurrogates(sequence) ? i : Array.from(sequence.slice(0, i)).length
     }
-    if (sequence instanceof Range) {
+    if (isRange(sequence)) {
         return sequence.indexOf(item)
     }
     return iterableArray(sequence).findIndex((element) => deepEquals(element, item))
@@ -873,7 +899,7 @@ export function slice(sequence: string, start?: number | null, stop?: number | n
 export function slice(sequence: Range, start?: number | null, stop?: number | null, step?: number | null): Range
 export function slice<T>(sequence: ArrayLike<T>, start?: number | null, stop?: number | null, step?: number | null): T[]
 export function slice(sequence: unknown, start?: number | null, stop?: number | null, step?: number | null): unknown {
-    if (sequence instanceof Range) {
+    if (isRange(sequence)) {
         return sequence.slice(start, stop, step)
     }
     const isString = typeof sequence === 'string'
@@ -1062,7 +1088,7 @@ export function is_empty(object: unknown): boolean {
     if (object === null || object === undefined) {
         return true
     }
-    if (typeof object === 'string' || Array.isArray(object) || object instanceof Range) {
+    if (typeof object === 'string' || Array.isArray(object) || isRange(object)) {
         return object.length === 0
     }
     if (object instanceof Map || object instanceof Set) {
@@ -1109,6 +1135,12 @@ export function deepcopy<T>(object: T, memo: Map<unknown, unknown> = new Map()):
     if (memo.has(object)) {
         return memo.get(object) as T
     }
+    const custom = (object as {__deepcopy__?: (memo: Map<unknown, unknown>) => T}).__deepcopy__
+    if (typeof custom === 'function') {
+        const result = custom.call(object, memo)
+        memo.set(object, result)
+        return result
+    }
     if (object instanceof Date || object instanceof RegExp || ArrayBuffer.isView(object) || object instanceof ArrayBuffer) {
         const result = copy(object)
         memo.set(object, result)
@@ -1126,7 +1158,7 @@ export function deepcopy<T>(object: T, memo: Map<unknown, unknown> = new Map()):
         return result as T
     }
     if (object instanceof Set) {
-        const result = new Set()
+        const result = new (object.constructor as SetConstructor)()
         memo.set(object, result)
         for (const v of object) {
             result.add(deepcopy(v, memo))
@@ -1135,11 +1167,13 @@ export function deepcopy<T>(object: T, memo: Map<unknown, unknown> = new Map()):
     }
     const make = (object.constructor as {_make?: (items: Iterable<unknown>) => T})?._make
     if (Array.isArray(object) && object.constructor !== Array && typeof make === 'function') {
-        // namedtuples are frozen, so build a new one from deep-copied fields
-        const result = make.call(
-            object.constructor,
-            object.map((item) => deepcopy(item, memo)),
-        )
+        // namedtuples are frozen, so build a new one from deep-copied fields;
+        // like CPython's _deepcopy_tuple, reuse a copy made while recursing
+        const items = object.map((item) => deepcopy(item, memo))
+        if (memo.has(object)) {
+            return memo.get(object) as T
+        }
+        const result = make.call(object.constructor, items)
         memo.set(object, result)
         return result
     }

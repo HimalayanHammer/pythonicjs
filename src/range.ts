@@ -75,10 +75,9 @@ export class Range implements Iterable<number> {
 
     /** Python's range[start:stop:step], returning another Range. */
     slice(start?: number | null, stop?: number | null, step?: number | null): Range {
-        const [lo, , st, count] = adjustSlice(this.length, start, stop, step)
-        const newStep = this.step * st
-        const first = this.start + lo * this.step
-        return new Range(first, first + count * newStep, newStep)
+        // CPython's compute_slice: map the adjusted slice indices onto this range
+        const [lo, hi, st] = adjustSlice(this.length, start, stop, step)
+        return new Range(this.start + lo * this.step, this.start + hi * this.step, this.step * st)
     }
 
     toArray(): number[] {

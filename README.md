@@ -75,6 +75,8 @@ print(new Counter('hello').most_common(1))
 print(list(itertools.permutations('abc', 2)))
 ```
 
+JSR (Deno) has no global entry point, because JSR doesn't allow global type declarations; call `install()` from the main module instead.
+
 This installs the builtins, the string functions, `Counter`, `deque`, `defaultdict`, `OrderedDict`, `namedtuple`, the Python exceptions, and the `itertools`, `heapq`, `bisect`, `functools` and `collections` namespaces. TypeScript sees them as typed globals. In browsers, the global `print` replaces `window.print`.
 
 ### CommonJS
@@ -143,7 +145,7 @@ Functions take the object first where Python uses a method: `s.split(',')` becom
 | `iter(iterable)`, `next(iterator, default?)` | `next` raises `StopIteration` at the end unless a default is given. |
 | `slice(seq, start?, stop?, step?)` | Python slicing for arrays, strings (by code point) and ranges; `null` means omitted. |
 | `abs(x)`, `pow(x, y, mod?)`, `divmod(a, b)`, `round(x, ndigits?)` | Python semantics; `pow` with a modulus is exact (BigInt) and supports negative exponents. |
-| `int(x, base = 10)`, `float(x)`, `str(x)` | `int` accepts prefixes, `base = 0`, `_` separators and Unicode digits, and returns a `BigInt` beyond `Number.MAX_SAFE_INTEGER`. `str` is JavaScript's `String`; use `repr` for Python's repr. |
+| `int(x, base = 10)`, `float(x)`, `str(x)` | `int` accepts prefixes, `base = 0`, `_` separators and Unicode digits; it returns a number, or a `BigInt` for `BigInt` input. `str` is JavaScript's `String`; use `repr` for Python's repr. |
 | `chr(i)`, `ord(c)`, `hex(n)`, `oct(n)`, `bin(n)` | |
 | `callable(x)`, `type(x)` | `type` is `typeof`, with `'array'` and `'null'`. |
 | `getattr(obj, name, default?)`, `setattr`, `hasattr`, `delattr` | |
@@ -205,7 +207,7 @@ The package is written in TypeScript and ships declarations for ESM, CommonJS an
 
 JavaScript can't express everything Python does, so a few things are deliberate:
 
-- **Numbers:** JavaScript can't tell `3` from `3.0`, so integral numbers are treated as Python ints (for example, `format(3, '')` is `'3'`). `int()` returns a `BigInt` when the result is beyond `Number.MAX_SAFE_INTEGER`.
+- **Numbers:** JavaScript can't tell `3` from `3.0`, so integral numbers are treated as Python ints (for example, `format(3, '')` is `'3'`). Like `Number()`, `int('9007199254740993')` rounds to the nearest number; pass a `BigInt` (`int(2n ** 100n)`) to keep big integers exact.
 - **Eager vs lazy:** `map`, `filter`, `zip`, `enumerate` and `reversed` return arrays, which is more useful in JavaScript. `range` and everything in `itertools` are lazy, like Python.
 - **Indexing:** use `at(-1)` on a `Range` or `deque` instead of `[-1]`, and `counter.get(key)` / `defaultdict.get(key)` instead of `d[key]`.
 - **Unicode:** string predicates and case mapping use the JavaScript engine's Unicode tables, which can be a version ahead of CPython's.
