@@ -17,7 +17,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
       # the differential tests compare every result with real CPython
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: npm ci
@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: npm ci
