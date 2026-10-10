@@ -1,0 +1,36 @@
+# Publishes to npm (with provenance, via trusted publishing) and JSR when a
+# version tag is pushed:  npm version minor && git push --follow-tags
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check the tag matches package.json and jsr.json
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          test "$tag" = "$(node -p "require('./package.json').version")"
+          test "$tag" = "$(node -p "require('./jsr.json').version")"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+        env:
+          PYTHON: python
+      - run: npm publish --provenance --access public
+      - run: npx jsr publish

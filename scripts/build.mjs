@@ -6,13 +6,17 @@ import {join} from 'node:path'
 import {build} from 'esbuild'
 
 const dist = 'dist'
+// source maps for the module builds are only needed to map coverage back to src/
+const sourcemap = process.env.SOURCEMAPS === '1'
 rmSync(dist, {recursive: true, force: true})
 
-const entryPoints = readdirSync('src').filter((f) => f.endsWith('.ts')).map((f) => join('src', f))
+const entryPoints = readdirSync('src')
+    .filter((f) => f.endsWith('.ts'))
+    .map((f) => join('src', f))
 
 // one output file per source file, so the subpath exports share modules
-await build({entryPoints, outdir: `${dist}/esm`, format: 'esm', target: 'es2022', sourcemap: true, keepNames: true})
-await build({entryPoints, outdir: `${dist}/cjs`, format: 'cjs', target: 'es2022', sourcemap: true, keepNames: true})
+await build({entryPoints, outdir: `${dist}/esm`, format: 'esm', target: 'es2022', keepNames: true, sourcemap})
+await build({entryPoints, outdir: `${dist}/cjs`, format: 'cjs', target: 'es2022', keepNames: true, sourcemap})
 writeFileSync(`${dist}/cjs/package.json`, '{"type": "commonjs"}\n')
 
 // type declarations (tsc also type-checks the source)

@@ -15,5 +15,30 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
+      # the differential tests compare every result with real CPython
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
       - run: npm ci
+      - run: npm run lint
       - run: npm test
+        env:
+          PYTHON: python
+      - run: npm run test:types
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: npm ci
+      - run: npm run coverage
+        env:
+          PYTHON: python

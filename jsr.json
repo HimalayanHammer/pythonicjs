@@ -1,0 +1,17 @@
+{
+  "name": "@qrishna/pythonicjs",
+  "version": "6.0.0",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./global": "./src/global.ts",
+    "./itertools": "./src/itertools.ts",
+    "./collections": "./src/collections.ts",
+    "./heapq": "./src/heapq.ts",
+    "./bisect": "./src/bisect.ts",
+    "./functools": "./src/functools.ts"
+  },
+  "publish": {
+    "include": ["src", "README.md", "LICENSE.md", "CHANGELOG.md"]
+  }
+}

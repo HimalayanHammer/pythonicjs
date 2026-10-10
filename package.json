@@ -84,7 +84,6 @@
   },
   "files": [
     "dist",
-    "src",
     "CHANGELOG.md"
   ],
   "sideEffects": [
@@ -97,10 +96,12 @@
     "build": "node scripts/build.mjs",
     "pretest": "npm run build",
     "test": "mocha",
-    "coverage": "npm run build && c8 mocha",
+    "coverage": "SOURCEMAPS=1 npm run build && c8 mocha",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "prepublishOnly": "npm run lint && npm test"
+    "prepublishOnly": "npm run lint && npm test",
+    "test:types": "tsc -p test/types/tsconfig.json",
+    "docs": "npm run build && cp dist/pythonicjs.global.min.js dist/pythonicjs.global.min.js.map docs/ && npx --yes serve docs"
   },
   "engines": {
     "node": ">=20"
