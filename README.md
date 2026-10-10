@@ -87,7 +87,7 @@ const {zip, Counter} = require('pythonicjs')
 
 ### Browser
 
-The `<script>` build installs the globals and exposes everything as `window.pythonicjs`:
+The `<script>` build installs the globals and exposes everything as `window.pythonicjs`. It replaces the separate `pythonicjs-web` package, which is deprecated.
 
 ```html
 <script src="https://unpkg.com/pythonicjs"></script>

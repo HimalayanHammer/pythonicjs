@@ -13,6 +13,7 @@ A rewrite in TypeScript, with Python's standard library and tests that compare e
 - `sum()` raises `TypeError` for strings, `round()` raises `TypeError` for non-numbers, and `len()` counts code points.
 - `strip()` and friends use Python's whitespace set instead of JavaScript's `trim()`.
 - Node.js 20 or newer.
+- The separate `pythonicjs-web` package is deprecated: this package now ships the same `<script>` build (`https://unpkg.com/pythonicjs`).
 
 ### New
 - `collections`: `Counter`, `defaultdict`, `deque`, `OrderedDict`, `namedtuple`.
