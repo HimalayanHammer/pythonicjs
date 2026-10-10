@@ -1,0 +1,11 @@
+{
+  "all": true,
+  "src": ["src"],
+  "include": ["src/**", "dist/**"],
+  "exclude": ["src/browser.ts", "dist/esm/browser.js", "dist/cjs/browser.js"],
+  "reporter": ["text", "text-summary", "lcov"],
+  "check-coverage": true,
+  "lines": 90,
+  "functions": 85,
+  "branches": 80
+}
