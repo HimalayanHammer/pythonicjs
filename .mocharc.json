@@ -1,0 +1,4 @@
+{
+  "spec": ["test/*.test.{js,mjs,cjs}"],
+  "timeout": 60000
+}

@@ -1,23 +1,109 @@
 {
   "name": "pythonicjs",
-  "version": "5.0.0",
-  "description": "Python's built-in functions for JavaScript: print, len, range, sorted, zip, enumerate and more, in Node.js and the browser",
-  "main": "pythonicjs.js",
-  "unpkg": "pythonicjs.js",
-  "jsdelivr": "pythonicjs.js",
+  "version": "6.0.0",
+  "description": "Python's builtins and standard library for JavaScript and TypeScript: range, zip, enumerate, sorted, Counter, deque, defaultdict, itertools, heapq, bisect and str.format, verified against CPython",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "unpkg": "./dist/pythonicjs.global.min.js",
+  "jsdelivr": "./dist/pythonicjs.global.min.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./global": {
+      "import": {
+        "types": "./dist/esm/global.d.ts",
+        "default": "./dist/esm/global.js"
+      },
+      "require": {
+        "types": "./dist/cjs/global.d.ts",
+        "default": "./dist/cjs/global.js"
+      }
+    },
+    "./itertools": {
+      "import": {
+        "types": "./dist/esm/itertools.d.ts",
+        "default": "./dist/esm/itertools.js"
+      },
+      "require": {
+        "types": "./dist/cjs/itertools.d.ts",
+        "default": "./dist/cjs/itertools.js"
+      }
+    },
+    "./collections": {
+      "import": {
+        "types": "./dist/esm/collections.d.ts",
+        "default": "./dist/esm/collections.js"
+      },
+      "require": {
+        "types": "./dist/cjs/collections.d.ts",
+        "default": "./dist/cjs/collections.js"
+      }
+    },
+    "./heapq": {
+      "import": {
+        "types": "./dist/esm/heapq.d.ts",
+        "default": "./dist/esm/heapq.js"
+      },
+      "require": {
+        "types": "./dist/cjs/heapq.d.ts",
+        "default": "./dist/cjs/heapq.js"
+      }
+    },
+    "./bisect": {
+      "import": {
+        "types": "./dist/esm/bisect.d.ts",
+        "default": "./dist/esm/bisect.js"
+      },
+      "require": {
+        "types": "./dist/cjs/bisect.d.ts",
+        "default": "./dist/cjs/bisect.js"
+      }
+    },
+    "./functools": {
+      "import": {
+        "types": "./dist/esm/functools.d.ts",
+        "default": "./dist/esm/functools.js"
+      },
+      "require": {
+        "types": "./dist/cjs/functools.d.ts",
+        "default": "./dist/cjs/functools.js"
+      }
+    },
+    "./browser": "./dist/pythonicjs.global.min.js",
+    "./package.json": "./package.json"
+  },
   "files": [
-    "pythonicjs.js",
+    "dist",
+    "src",
     "CHANGELOG.md"
   ],
+  "sideEffects": [
+    "./dist/esm/global.js",
+    "./dist/cjs/global.js",
+    "./dist/pythonicjs.global.js",
+    "./dist/pythonicjs.global.min.js"
+  ],
   "scripts": {
-    "test": "mocha"
-  },
-  "devDependencies": {
-    "chai": "^4.5.0",
-    "mocha": "^10.8.2"
+    "build": "node scripts/build.mjs",
+    "pretest": "npm run build",
+    "test": "mocha",
+    "coverage": "npm run build && c8 mocha",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "prepublishOnly": "npm run lint && npm test"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=20"
   },
   "repository": {
     "type": "git",
@@ -26,18 +112,32 @@
   "keywords": [
     "python",
     "pythonic",
-    "pythonicjs",
     "builtins",
+    "itertools",
+    "collections",
+    "Counter",
+    "deque",
+    "heapq",
+    "bisect",
     "range",
     "zip",
     "enumerate",
-    "sorted",
-    "utility"
+    "str.format",
+    "typescript",
+    "leetcode"
   ],
   "author": "Krishna Bhattarai",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/KrishnaMBhattarai/pythonicjs/issues"
   },
-  "homepage": "https://github.com/KrishnaMBhattarai/pythonicjs#readme"
+  "homepage": "https://github.com/KrishnaMBhattarai/pythonicjs#readme",
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "c8": "^12.0.0",
+    "chai": "^6.3.0",
+    "esbuild": "^0.28.2",
+    "mocha": "^12.0.3",
+    "typescript": "^7.0.2"
+  }
 }
