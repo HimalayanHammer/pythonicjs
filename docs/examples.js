@@ -135,7 +135,7 @@ print(sorted(['Ada Lovelace', 'Alan Turing', 'Grace Hopper'], {key: byLastName})
 print(round(0.5), round(1.5), round(2.5))
 print(round(2.675, 2), '(2.675 is stored as 2.67499999...)')
 
-// Python 3.12+ uses compensated summation
+// Python 3.13+ uses compensated summation
 print(sum(Array(10).fill(0.1)), 'vs', [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1].reduce((a, b) => a + b))
 
 // BigInts stay exact

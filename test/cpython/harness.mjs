@@ -10,11 +10,11 @@ import vm from 'node:vm'
 
 const here = dirname(fileURLToPath(import.meta.url))
 
-/** The first python on PATH that is 3.12 or newer, or null. */
+/** The first python on PATH that is 3.13 or newer, or null. The cases follow 3.13's behaviour. */
 export function findPython() {
-    const candidates = [process.env.PYTHON, 'python3.13', 'python3.12', 'python3', 'python'].filter(Boolean)
+    const candidates = [process.env.PYTHON, 'python3.13', 'python3', 'python'].filter(Boolean)
     for (const exe of candidates) {
-        const r = spawnSync(exe, ['-c', 'import sys; print(sys.version_info >= (3, 12))'], {encoding: 'utf8'})
+        const r = spawnSync(exe, ['-c', 'import sys; print(sys.version_info >= (3, 13))'], {encoding: 'utf8'})
         if (r.status === 0 && r.stdout.trim() === 'True') {
             return exe
         }

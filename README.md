@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/pythonicjs.svg)](https://www.npmjs.com/package/pythonicjs)
 [![JSR](https://jsr.io/badges/@qrishna/pythonicjs)](https://jsr.io/@qrishna/pythonicjs)
 [![tests](https://github.com/KrishnaMBhattarai/pythonicjs/actions/workflows/test.yml/badge.svg)](https://github.com/KrishnaMBhattarai/pythonicjs/actions/workflows/test.yml)
-[![verified against CPython](https://img.shields.io/badge/verified%20against-CPython%203.12%2B-3776ab)](#verified-against-cpython)
+[![verified against CPython](https://img.shields.io/badge/verified%20against-CPython%203.13-3776ab)](#verified-against-cpython)
 [![types](https://img.shields.io/badge/types-TypeScript-3178c6)](#typescript)
 
 **Python's builtins and standard library for JavaScript and TypeScript**: lazy `range`, `zip`, `enumerate`, `sorted` with `key`, `Counter`, `deque`, `defaultdict`, `heapq`, `bisect`, `itertools`, `functools` and `str.format`. Every function is tested against real CPython.
@@ -112,7 +112,7 @@ str_format('{name} is {age}', {name: 'Ada', age: 36})
 
 ## Verified against CPython
 
-The test suite includes thousands of differential tests: hand-picked edge cases plus seeded random fuzzing. Each case runs through pythonicjs and through CPython 3.12+, and the results must be identical, including which exception is raised. Some of the details this guarantees:
+The test suite includes thousands of differential tests: hand-picked edge cases plus seeded random fuzzing. Each case runs through pythonicjs and through CPython 3.13, and the results must be identical, including which exception is raised. Some of the details this guarantees:
 
 - `round(2.5)` is `2` and `round(2.675, 2)` is `2.67`: Python rounds the exact binary value half to even.
 - `sum` of ten `0.1`s is exactly `1`, like Python 3.12's compensated summation.
@@ -234,7 +234,7 @@ npm run lint
 npm run docs         # serves the docs site and playground locally
 ```
 
-The differential tests need Python 3.12 or newer on your `PATH` (or set `PYTHON=/path/to/python3`). They are skipped locally when Python isn't found, and required in CI. Test cases live in `test/cpython/*.cases.mjs`: each one is a JavaScript snippet and the equivalent Python snippet.
+The differential tests need Python 3.13 or newer on your `PATH` (or set `PYTHON=/path/to/python3`). They are skipped locally when Python isn't found, and required in CI. Test cases live in `test/cpython/*.cases.mjs`: each one is a JavaScript snippet and the equivalent Python snippet.
 
 Releases are published by GitHub Actions when a version tag is pushed (`npm version minor && git push --follow-tags`), to npm with provenance and to JSR.
 

@@ -25,7 +25,7 @@ A rewrite in TypeScript, with Python's standard library and tests that compare e
 - Compensated float summation in `sum()`, like Python 3.12.
 - Dunder hooks for custom classes: `__lt__`, `__eq__`, `__len__`, `__bool__`, `__repr__`, `__format__`, `__copy__`.
 - TypeScript declarations with precise generics, ES modules, CommonJS, subpath exports (`pythonicjs/itertools`, ...), typed global mode, and a JSR package.
-- Differential tests against CPython 3.12+, a docs site with a playground, and releases with npm provenance.
+- Differential tests against CPython 3.13, a docs site with a playground, and releases with npm provenance.
 
 ## 5.0.0
 
