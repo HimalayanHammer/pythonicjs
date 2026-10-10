@@ -11,6 +11,13 @@ export class ValueError extends Error {
     }
 }
 
+export class AttributeError extends Error {
+    constructor(message?: string) {
+        super(message)
+        this.name = 'AttributeError'
+    }
+}
+
 export class IndexError extends Error {
     constructor(message?: string) {
         super(message)

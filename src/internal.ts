@@ -300,7 +300,7 @@ export function pyRepr(x: unknown, seen: Set<unknown> = new Set()): string {
         return 'False'
     }
     if (typeof x === 'number') {
-        return Number.isInteger(x) && Math.abs(x) < 1e16 ? String(x + 0) : floatRepr(x)
+        return Number.isInteger(x) ? BigInt(x).toString() : floatRepr(x)
     }
     if (typeof x === 'bigint') {
         return x.toString()
