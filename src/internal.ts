@@ -242,3 +242,110 @@ export function adjustSlice(
     }
     return [lo, hi, st, count]
 }
+
+/** Python's repr() of a string: picks quotes like CPython and escapes non-printables. */
+export function stringRepr(s: string): string {
+    const quote = s.includes("'") && !s.includes('"') ? '"' : "'"
+    let out = quote
+    for (const ch of s) {
+        const cp = ch.codePointAt(0) as number
+        if (ch === quote || ch === '\\') {
+            out += `\\${ch}`
+        } else if (ch === '\n') {
+            out += '\\n'
+        } else if (ch === '\r') {
+            out += '\\r'
+        } else if (ch === '\t') {
+            out += '\\t'
+        } else if (cp < 0x20 || cp === 0x7f) {
+            out += `\\x${cp.toString(16).padStart(2, '0')}`
+        } else if (cp >= 0x80 && !isPrintable(ch)) {
+            if (cp <= 0xff) {
+                out += `\\x${cp.toString(16).padStart(2, '0')}`
+            } else if (cp <= 0xffff) {
+                out += `\\u${cp.toString(16).padStart(4, '0')}`
+            } else {
+                out += `\\U${cp.toString(16).padStart(8, '0')}`
+            }
+        } else {
+            out += ch
+        }
+    }
+    return out + quote
+}
+
+/** Roughly Python's str.isprintable() for a single character. */
+function isPrintable(ch: string): boolean {
+    if (ch === ' ') {
+        return true
+    }
+    return !/[\p{Cc}\p{Cf}\p{Cs}\p{Co}\p{Cn}\p{Zl}\p{Zp}\p{Zs}]/u.test(ch)
+}
+
+/** Python's repr() of a float or int. */
+export type NumberRepr = (x: number) => string
+
+let floatReprImpl: NumberRepr = (x) => String(x)
+
+/** Lets numbers.ts plug in Python's float repr without an import cycle. */
+export function setFloatRepr(fn: NumberRepr): void {
+    floatReprImpl = fn
+}
+
+/**
+ * Python's repr() for JavaScript values: strings get quotes, numbers print
+ * like Python ints and floats, true/false/null become True/False/None,
+ * arrays become lists, plain objects and Maps become dicts and Sets become
+ * sets. Objects can define __repr__() to customise it.
+ */
+export function pyRepr(x: unknown, seen: Set<unknown> = new Set()): string {
+    if (x === null || x === undefined) {
+        return 'None'
+    }
+    if (x === true) {
+        return 'True'
+    }
+    if (x === false) {
+        return 'False'
+    }
+    if (typeof x === 'number') {
+        return Number.isInteger(x) && Math.abs(x) < 1e16 ? String(x + 0) : floatReprImpl(x)
+    }
+    if (typeof x === 'bigint') {
+        return x.toString()
+    }
+    if (typeof x === 'string') {
+        return stringRepr(x)
+    }
+    if (typeof x === 'function') {
+        return `<function ${x.name || '<lambda>'}>`
+    }
+    if (typeof x === 'symbol') {
+        return x.toString()
+    }
+    const custom = (x as {__repr__?: () => string}).__repr__
+    if (typeof custom === 'function') {
+        return custom.call(x)
+    }
+    if (seen.has(x)) {
+        return Array.isArray(x) ? '[...]' : '{...}'
+    }
+    seen.add(x)
+    try {
+        if (Array.isArray(x)) {
+            return `[${x.map((v) => pyRepr(v, seen)).join(', ')}]`
+        }
+        if (x instanceof Map) {
+            return `{${Array.from(x, ([k, v]) => `${pyRepr(k, seen)}: ${pyRepr(v, seen)}`).join(', ')}}`
+        }
+        if (x instanceof Set) {
+            return x.size === 0 ? 'set()' : `{${Array.from(x, (v) => pyRepr(v, seen)).join(', ')}}`
+        }
+        if (isPlainObject(x)) {
+            return `{${Object.entries(x).map(([k, v]) => `${stringRepr(k)}: ${pyRepr(v, seen)}`).join(', ')}}`
+        }
+        return String(x)
+    } finally {
+        seen.delete(x)
+    }
+}

@@ -4,6 +4,8 @@
  * Not part of the public API.
  */
 
+import {setFloatRepr} from './internal.js'
+
 export interface Decimal {
     /** true when the sign bit is set (including -0) */
     neg: boolean
@@ -162,3 +164,5 @@ export function floatRepr(x: number): string {
     const frac = digits.slice(exponent + 1)
     return `${sign}${int}.${frac || '0'}`
 }
+
+setFloatRepr(floatRepr)
