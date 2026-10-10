@@ -1,6 +1,7 @@
 /** Helpers shared by the modules. Not part of the public API. */
 
 import {ValueError} from './errors.js'
+import {floatRepr} from './numbers.js'
 
 export type Key<T> = ((item: T) => unknown) | null | undefined
 
@@ -282,16 +283,6 @@ function isPrintable(ch: string): boolean {
     return !/[\p{Cc}\p{Cf}\p{Cs}\p{Co}\p{Cn}\p{Zl}\p{Zp}\p{Zs}]/u.test(ch)
 }
 
-/** Python's repr() of a float or int. */
-export type NumberRepr = (x: number) => string
-
-let floatReprImpl: NumberRepr = (x) => String(x)
-
-/** Lets numbers.ts plug in Python's float repr without an import cycle. */
-export function setFloatRepr(fn: NumberRepr): void {
-    floatReprImpl = fn
-}
-
 /**
  * Python's repr() for JavaScript values: strings get quotes, numbers print
  * like Python ints and floats, true/false/null become True/False/None,
@@ -309,7 +300,7 @@ export function pyRepr(x: unknown, seen: Set<unknown> = new Set()): string {
         return 'False'
     }
     if (typeof x === 'number') {
-        return Number.isInteger(x) && Math.abs(x) < 1e16 ? String(x + 0) : floatReprImpl(x)
+        return Number.isInteger(x) && Math.abs(x) < 1e16 ? String(x + 0) : floatRepr(x)
     }
     if (typeof x === 'bigint') {
         return x.toString()
