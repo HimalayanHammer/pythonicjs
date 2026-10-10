@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>pythonicjs</title>
+    <meta name="description" content="Python's builtins and standard library for JavaScript and TypeScript: range, zip, sorted, Counter, deque, heapq, bisect, itertools and str.format, verified against CPython.">
+    <meta property="og:title" content="pythonicjs: Python's standard library for JavaScript">
+    <meta property="og:description" content="Counter, deque, heapq, bisect, itertools, lazy range() and str.format for JS and TS, tested against real CPython.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+    <div class="wrap">
+        <p class="eyebrow">pythonicjs 6</p>
+        <h1>Python's standard library, in JavaScript.</h1>
+        <p class="lede">
+            <code>range</code>, <code>zip</code>, <code>sorted</code>, <code>Counter</code>, <code>deque</code>,
+            <code>heapq</code>, <code>bisect</code>, <code>itertools</code> and <code>str.format</code>, with
+            TypeScript types and every result checked against real CPython.
+        </p>
+        <div class="install">
+            <code id="install-cmd">npm install pythonicjs</code>
+            <button type="button" class="copy" data-copy="install-cmd" aria-label="Copy install command">Copy</button>
+        </div>
+        <nav class="links">
+            <a href="#playground">Playground</a>
+            <a href="#cheatsheet">Cheat sheet</a>
+            <a href="#verified">Verified against CPython</a>
+            <a href="#usage">Usage</a>
+            <a href="https://github.com/KrishnaMBhattarai/pythonicjs#reference">API reference</a>
+            <a href="https://github.com/KrishnaMBhattarai/pythonicjs">GitHub</a>
+        </nav>
+    </div>
+</header>
+
+<main class="wrap">
+    <section id="playground">
+        <h2>Playground</h2>
+        <p class="muted">Everything is installed as globals here, like <code>import 'pythonicjs/global'</code>. <code>print()</code> output appears below, formatted like Python.</p>
+        <div class="tabs" role="tablist" id="example-tabs"></div>
+        <div class="editor">
+            <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="JavaScript code"></textarea>
+            <div class="toolbar">
+                <button type="button" id="run" class="primary">Run <kbd>⌘/Ctrl ↵</kbd></button>
+                <button type="button" id="reset">Reset</button>
+            </div>
+            <pre id="output" aria-live="polite"></pre>
+        </div>
+    </section>
+
+    <section id="cheatsheet">
+        <h2>Python → JavaScript cheat sheet</h2>
+        <p class="muted">JavaScript has no keyword arguments, so Python's <code>key=</code>, <code>reverse=</code>, <code>default=</code> become a trailing options object.</p>
+        <div class="table-scroll">
+        <table>
+            <thead><tr><th>Python</th><th>pythonicjs</th></tr></thead>
+            <tbody>
+            <tr class="group"><td colspan="2">Builtins</td></tr>
+            <tr><td><code>for i in range(10):</code></td><td><code>for (const i of range(10))</code></td></tr>
+            <tr><td><code>for i, x in enumerate(xs, 1):</code></td><td><code>for (const [i, x] of enumerate(xs, 1))</code></td></tr>
+            <tr><td><code>list(zip(a, b))</code></td><td><code>zip(a, b)</code></td></tr>
+            <tr><td><code>sorted(xs, key=len, reverse=True)</code></td><td><code>sorted(xs, {key: len, reverse: true})</code></td></tr>
+            <tr><td><code>max(xs, key=f, default=0)</code></td><td><code>max(xs, {key: f, default: 0})</code></td></tr>
+            <tr><td><code>sum(xs)</code>, <code>any(xs)</code>, <code>all(xs)</code></td><td><code>sum(xs)</code>, <code>any(xs)</code>, <code>all(xs)</code></td></tr>
+            <tr><td><code>xs[::-1]</code>, <code>s[2:-1]</code></td><td><code>slice(xs, null, null, -1)</code>, <code>slice(s, 2, -1)</code></td></tr>
+            <tr><td><code>q, r = divmod(a, b)</code></td><td><code>const [q, r] = divmod(a, b)</code></td></tr>
+            <tr><td><code>int('ff', 16)</code>, <code>hex(255)</code>, <code>round(2.5)</code></td><td><code>int('ff', 16)</code>, <code>hex(255)</code>, <code>round(2.5)</code></td></tr>
+            <tr><td><code>pow(a, -1, m)</code></td><td><code>pow(a, -1, m)</code></td></tr>
+            <tr><td><code>next(it, None)</code></td><td><code>next(it, null)</code></td></tr>
+            <tr class="group"><td colspan="2">Strings</td></tr>
+            <tr><td><code>s.split()</code>, <code>s.rsplit(',', 1)</code></td><td><code>split(s)</code>, <code>rsplit(s, ',', 1)</code></td></tr>
+            <tr><td><code>', '.join(words)</code></td><td><code>join(', ', words)</code></td></tr>
+            <tr><td><code>s.strip('xy')</code>, <code>s.zfill(5)</code>, <code>s.title()</code></td><td><code>strip(s, 'xy')</code>, <code>zfill(s, 5)</code>, <code>title(s)</code></td></tr>
+            <tr><td><code>'{:>8,.2f}'.format(x)</code></td><td><code>str_format('{:>8,.2f}', x)</code></td></tr>
+            <tr><td><code>'{name}'.format(name=n)</code></td><td><code>str_format('{name}', {name: n})</code></td></tr>
+            <tr><td><code>format(x, '08b')</code>, <code>repr(x)</code></td><td><code>format(x, '08b')</code>, <code>repr(x)</code></td></tr>
+            <tr class="group"><td colspan="2">collections</td></tr>
+            <tr><td><code>Counter(words).most_common(3)</code></td><td><code>new Counter(words).most_common(3)</code></td></tr>
+            <tr><td><code>c['missing']</code> → <code>0</code></td><td><code>c.get('missing')</code> → <code>0</code></td></tr>
+            <tr><td><code>d = defaultdict(list); d[k].append(v)</code></td><td><code>const d = new defaultdict(list); d.get(k).push(v)</code></td></tr>
+            <tr><td><code>q = deque(maxlen=3); q.appendleft(x)</code></td><td><code>const q = new deque([], 3); q.appendleft(x)</code></td></tr>
+            <tr><td><code>q[-1]</code></td><td><code>q.at(-1)</code></td></tr>
+            <tr><td><code>Point = namedtuple('Point', 'x y')</code></td><td><code>const Point = namedtuple('Point', 'x y')</code></td></tr>
+            <tr class="group"><td colspan="2">heapq, bisect, functools</td></tr>
+            <tr><td><code>heapq.heappush(h, (d, node))</code></td><td><code>heapq.heappush(h, [d, node])</code></td></tr>
+            <tr><td><code>heapq.nlargest(3, xs, key=f)</code></td><td><code>heapq.nlargest(3, xs, f)</code></td></tr>
+            <tr><td><code>bisect.bisect_left(a, x, key=f)</code></td><td><code>bisect.bisect_left(a, x, {key: f})</code></td></tr>
+            <tr><td><code>@functools.cache</code></td><td><code>const f = functools.cache((n) =&gt; ...)</code></td></tr>
+            <tr><td><code>functools.reduce(f, xs, init)</code></td><td><code>functools.reduce(f, xs, init)</code></td></tr>
+            <tr class="group"><td colspan="2">itertools (lazy, like Python)</td></tr>
+            <tr><td><code>itertools.combinations(xs, 2)</code></td><td><code>itertools.combinations(xs, 2)</code></td></tr>
+            <tr><td><code>itertools.product(a, b, repeat=2)</code></td><td><code>itertools.product(a, b, {repeat: 2})</code></td></tr>
+            <tr><td><code>itertools.zip_longest(a, b, fillvalue=0)</code></td><td><code>itertools.zip_longest(a, b, {fillvalue: 0})</code></td></tr>
+            <tr><td><code>from itertools import groupby</code></td><td><code>import {groupby} from 'pythonicjs/itertools'</code></td></tr>
+            <tr class="group"><td colspan="2">Exceptions</td></tr>
+            <tr><td><code>except ValueError as e:</code></td><td><code>catch (e) { if (e instanceof ValueError) ... }</code></td></tr>
+            </tbody>
+        </table>
+        </div>
+    </section>
+
+    <section id="verified">
+        <h2>Verified against CPython</h2>
+        <p>
+            The test suite generates thousands of cases, hand-picked edge cases plus seeded random fuzzing, and runs each one
+            through pythonicjs <em>and</em> through CPython 3.12+. The results, including which exception is raised, must be identical.
+            That is why these all behave exactly like Python:
+        </p>
+        <ul class="facts">
+            <li><code>round(2.5)</code> is <code>2</code> and <code>round(2.675, 2)</code> is <code>2.67</code>: half-to-even on the exact binary value.</li>
+            <li><code>sum</code> of ten <code>0.1</code>s is exactly <code>1</code>, like Python 3.12's compensated summation.</li>
+            <li><code>int('١٢')</code> is <code>12</code> and <code>int('12px')</code> raises <code>ValueError</code>.</li>
+            <li><code>sorted(['a', 1])</code> raises <code>TypeError</code> instead of silently mis-sorting.</li>
+            <li><code>heapq</code> produces the same heap layout as CPython, and <code>most_common</code> breaks ties the same way.</li>
+            <li>Format specs like <code>'{:=+10.3e}'</code>, <code>'{:_b}'</code> and <code>'{:,.2%}'</code> produce the same text.</li>
+        </ul>
+    </section>
+
+    <section id="usage">
+        <h2>Usage</h2>
+        <div class="grid">
+            <div>
+                <h3>ES modules (tree-shakable)</h3>
+<pre><code>import {range, zip, Counter, itertools} from 'pythonicjs'
+import {combinations} from 'pythonicjs/itertools'
+import {heappush, heappop} from 'pythonicjs/heapq'</code></pre>
+            </div>
+            <div>
+                <h3>Global mode, for scripts and REPLs</h3>
+<pre><code>import 'pythonicjs/global'
+
+print(sum(range(10)))
+print(new Counter('hello').most_common(1))</code></pre>
+            </div>
+            <div>
+                <h3>Browser</h3>
+<pre><code>&lt;script src="https://unpkg.com/pythonicjs"&gt;&lt;/script&gt;
+&lt;script&gt;
+    print(sorted([3, 1, 2]))
+&lt;/script&gt;</code></pre>
+            </div>
+            <div>
+                <h3>CommonJS, Deno, Bun</h3>
+<pre><code>const {zip} = require('pythonicjs')
+
+// Deno
+import {zip} from 'jsr:@qrishna/pythonicjs'</code></pre>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="wrap">
+    <p>MIT licensed · by <a href="https://github.com/KrishnaMBhattarai">Krishna Bhattarai</a> · <a href="https://www.npmjs.com/package/pythonicjs">npm</a> · <a href="https://jsr.io/@qrishna/pythonicjs">JSR</a></p>
+</footer>
+
+<script src="pythonicjs.global.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -4,3 +4,5 @@ coverage
 .DS_Store
 .idea
 .claude
+docs/pythonicjs.global.min.js
+docs/pythonicjs.global.min.js.map

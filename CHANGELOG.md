@@ -1,5 +1,32 @@
 # Changelog
 
+## 6.0.0
+
+A rewrite in TypeScript, with Python's standard library and tests that compare every result with CPython.
+
+### Breaking changes
+- Importing or requiring `pythonicjs` no longer installs globals. Use `import 'pythonicjs/global'` / `require('pythonicjs/global')` for the old behaviour. The `<script>` build still installs globals and `window.pythonicjs`.
+- The module is no longer callable (`require('pythonicjs')()`); use `install(target?)` or `pythonicjs/global`.
+- `range()` returns a lazy `Range` (iterable, with `length`, `at`, `map`, `filter`, ...) instead of an array, so `range(1e9)` is cheap. Use `list(range(n))` for an array.
+- `round()` rounds half to even on the exact value, like Python: `round(2.5)` is `2`, `round(2.675, 2)` is `2.67`.
+- Errors are Python exceptions (`ValueError`, `IndexError`, `KeyError`, `ZeroDivisionError`, `OverflowError`, `StopIteration`, or `TypeError`) with Python's messages.
+- `sum()` raises `TypeError` for strings, `round()` raises `TypeError` for non-numbers, and `len()` counts code points.
+- `strip()` and friends use Python's whitespace set instead of JavaScript's `trim()`.
+- `int()` returns a `BigInt` for results beyond `Number.MAX_SAFE_INTEGER` instead of losing precision.
+- Node.js 20 or newer.
+
+### New
+- `collections`: `Counter`, `defaultdict`, `deque`, `OrderedDict`, `namedtuple`.
+- `itertools`: every function, lazily, plus the popular recipes.
+- `heapq` (including the Python 3.14 max-heap functions), `bisect` and `functools` (`reduce`, `partial`, `cache`, `lru_cache`, `cmp_to_key`).
+- Strings: `split`, `rsplit`, `splitlines`, `join`, `partition`, `rpartition`, `startswith`, `endswith`, `removeprefix`, `removesuffix`, `replace`, `find`, `rfind`, `zfill`, `center`, `ljust`, `rjust`, `title`, `capitalize`, `swapcase`, `casefold`, `expandtabs` and the `is*` predicates.
+- Formatting: `str_format` (`str.format`), `format` with the full format-spec mini-language, `repr` and `ascii`.
+- Builtins: `slice`, `sort`, `iter`, `next`, `callable`, `delattr`, `zip(..., {strict})`, `pop` on objects and Maps, `pow(x, -1, m)`, and Unicode digits, `base = 0` and BigInts in `int()`.
+- Compensated float summation in `sum()`, like Python 3.12.
+- Dunder hooks for custom classes: `__lt__`, `__eq__`, `__len__`, `__bool__`, `__repr__`, `__format__`, `__copy__`.
+- TypeScript declarations with precise generics, ES modules, CommonJS, subpath exports (`pythonicjs/itertools`, ...), typed global mode, and a JSR package.
+- Differential tests against CPython 3.12+, a docs site with a playground, and releases with npm provenance.
+
 ## 5.0.0
 
 ### Breaking changes
