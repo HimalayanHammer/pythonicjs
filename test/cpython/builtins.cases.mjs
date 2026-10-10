@@ -152,4 +152,10 @@ for (const v of [[], [0], {}, '', 'a', 0, 0.0, 1, null]) {
 pair("list({a: 1, b: 2})", "list({'a': 1, 'b': 2})")
 same("list('abc')")
 
+
+
+// zip and map stop at the shortest input, even when another is infinite
+cases.push({js: "zip(itertools.count(), 'abc')", py: "list(zip(itertools.count(), 'abc'))"})
+cases.push({js: 'map((a, b) => a * b, itertools.count(1), [10, 20])', py: 'list(map(lambda a, b: a * b, itertools.count(1), [10, 20]))'})
+cases.push({js: "zip([1], [2], [3, 4], {strict: true})", py: 'list(zip([1], [2], [3, 4], strict=True))'})
 export default cases

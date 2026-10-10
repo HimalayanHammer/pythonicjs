@@ -732,14 +732,39 @@ export function zip(...args: unknown[]): unknown[][] {
     if (args.length === 0) {
         return []
     }
-    const arrays = args.map((a) => iterableArray(a as Iterable<unknown>))
-    const lengths = arrays.map((a) => a.length)
-    const length = Math.min(...lengths)
-    if (strict && lengths.some((n) => n !== length)) {
-        const bad = lengths.findIndex((n) => n !== lengths[0])
-        throw new ValueError(`zip() argument ${bad + 1} is ${lengths[bad] > lengths[0] ? 'longer' : 'shorter'} than argument 1`)
+    // pull items one at a time, so an infinite input (itertools.count()) is fine
+    const iterators = args.map((a) => iter(a as Iterable<unknown>))
+    const result: unknown[][] = []
+    for (;;) {
+        const row: unknown[] = []
+        for (const [i, it] of iterators.entries()) {
+            const step = it.next()
+            if (step.done) {
+                if (strict) {
+                    checkZipStrict(iterators, i)
+                }
+                return result
+            }
+            row.push(step.value)
+        }
+        result.push(row)
     }
-    return Array.from({length}, (_, i) => arrays.map((a) => a[i]))
+}
+
+function plural(n: number): string {
+    return n === 1 ? 'argument 1' : `arguments 1-${n}`
+}
+
+/** CPython's zip(strict=True) check once iterator `i` is exhausted. */
+function checkZipStrict(iterators: Iterator<unknown>[], i: number): void {
+    if (i > 0) {
+        throw new ValueError(`zip() argument ${i + 1} is shorter than ${plural(i)}`)
+    }
+    for (let j = 1; j < iterators.length; j++) {
+        if (!iterators[j].next().done) {
+            throw new ValueError(`zip() argument ${j + 1} is longer than ${plural(j)}`)
+        }
+    }
 }
 
 /** Items where fn(item) is truthy; filter(null, xs) keeps truthy items (Python truthiness). */
