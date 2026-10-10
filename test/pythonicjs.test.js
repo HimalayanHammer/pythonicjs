@@ -1,4 +1,4 @@
-require('./pythonicjs')
+require('../pythonicjs')
 
 const {expect} = require('chai');
 
@@ -237,7 +237,7 @@ describe('pythonicjs', () => {
 
     it('sorted function throws an error for unsupported iterable type', () => {
         // Arrange
-        const inputUnsupported = 'unsupported';
+        const inputUnsupported = 42;
 
         // Act and Assert
         expect(() => sorted(inputUnsupported)).to.throw(Error, 'Unsupported iterable type');
@@ -1034,15 +1034,8 @@ describe('pythonicjs', () => {
     expect(result).to.equal(42);
   });
 
-  it('int function returns NaN for an invalid string', () => {
-    // Arrange
-    const inputString = 'not a number';
-
-    // Act
-    const result = int(inputString);
-
-    // Assert
-    expect(result).to.be.NaN;
+  it('int function throws for an invalid string', () => {
+    expect(() => int('not a number')).to.throw(Error, 'invalid literal for int()');
   });
 
   // Additional Tests for float function
@@ -1057,15 +1050,8 @@ describe('pythonicjs', () => {
     expect(result).to.equal(3.14);
   });
 
-  it('float function returns NaN for an invalid string', () => {
-    // Arrange
-    const inputString = 'not a number';
-
-    // Act
-    const result = float(inputString);
-
-    // Assert
-    expect(result).to.be.NaN;
+  it('float function throws for an invalid string', () => {
+    expect(() => float('not a number')).to.throw(Error, 'could not convert string to float');
   });
 
   // Additional Tests for timestamp function

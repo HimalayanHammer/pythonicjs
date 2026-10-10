@@ -1,266 +1,180 @@
 # pythonicjs
-A js library for those that like python. 
 
+[![npm](https://img.shields.io/npm/v/pythonicjs.svg)](https://www.npmjs.com/package/pythonicjs)
+[![tests](https://github.com/KrishnaMBhattarai/pythonicjs/actions/workflows/test.yml/badge.svg)](https://github.com/KrishnaMBhattarai/pythonicjs/actions/workflows/test.yml)
 
-### Installation
-```bash
-npm install -g pythonicjs@latest
-```
-### Tests 
-```
-npx mocha pythonicjsTest.js
-```    
-Also check the test file to see how to use and test certain functionality
+Python's built-in functions for JavaScript. If you think in Python, write JavaScript like this:
 
- 
-### Importing & Using
+```js
+require('pythonicjs')
 
-### In nodejs
-```
-/** Require*/
-require("pythonicjs")()
-```
-
-### In the browser you can import it like this
-```
-<script src="https://unpkg.com/pythonicjs@latest"></script>
-```
-
-
-# Usage
-## Printing
-### Syntax: ```print(...message)```
-Prints messages to the console.
-```
-print("Hello", "World");
-```
-Output
-```
-Hello World
-```
-
-## Pretty Printing
-### Syntax: ```pprint(object)```
-Prints a prettified JSON representation of the object.
-```
-const exampleObject = { key: 'value', number: 42 };
-pprint(exampleObject);
-```
-Output
-```
-{
-  "key": "value",
-  "number": 42
+for (const [i, name] of enumerate(['ada', 'guido'], 1)) {
+    print(i, name)
 }
+print(sum(range(10)))                          // 45
+print(sorted(['bb', 'a', 'ccc'], {key: len}))  // [ 'a', 'bb', 'ccc' ]
+print(zip([1, 2, 3], 'abc'))                   // [ [ 1, 'a' ], [ 2, 'b' ], [ 3, 'c' ] ]
 ```
 
-## Logging
-### Syntax: ```log(...message)```
-Logs messages to the console with a timestamp.
-```
-log("This is a log message");
-```
-Output
-```
-2023-11-12T16:36:11.004Z ::==> This is a log message
+It has no dependencies, is a single file, and works in Node.js and the browser.
+
+## Installation
+
+```bash
+npm install pythonicjs
 ```
 
-## Mathematical Functions
-### Syntax: ```abs(object)```
-Returns the absolute value of a number.
+## Usage
 
-### Syntax: ```pow(x, y)```
-Returns x to the power of y.
+### Node.js
 
-### Syntax: ```random(min, max)```
-returns a random number between min, max
+Requiring the library installs every function as a global, just like Python's builtins:
 
-### Syntax: ```round(number, ndigits)```
-rounds the number to n digits
-
-
-### Syntax: ```sum(list)```
-Returns the sum of all elements in the list.
-
-### Syntax: ```max(list)```
-Returns the maximum value in the list.
-
-### Syntax: ```min(list)```
-Returns the minimum value in the list.
-
-### Syntax: ```len(object)```
-Returns the length of the object, it could be string or list 
-
-### Syntax: ```avg(list)```
-Returns the average value of the elements in the list.
-
-
-## List Operations
-### Syntax: ```sorted(list, order)```
-Sorts a list in ascending or descending order.
-```
-const ascending = sorted([3, 1, 4, 1, 5, 9]);
-const descending = sorted([3, 1, 4, 1, 5, 9], key=null, reverse=true);
-
-const sorted_dict_ascending = sorted( {b:4, p:5, a:1, q:0, c:-1})
-const sorted_dict_descending = sorted( {b:4, p:5, a:1, q:0, c:-1}, key=null, reverse=true)
-
-print(ascending)
-print(descending)
-print(sorted_dict_ascending)
-print(sorted_dict_descending)
-```
-output
-```
-[ 1, 1, 3, 4, 5, 9 ]
-[ 9, 5, 4, 3, 1, 1 ]
-{ a: 1, b: 4, c: -1, p: 5, q: 0 }
-{ q: 0, p: 5, c: -1, b: 4, a: 1 }
-
+```js
+require('pythonicjs')
+print(max(3, 7, 5))  // 7
 ```
 
-### Syntax: ```reversed(array)```
-Reverses the order of elements in an array.
-```
-const reversedArray = reversed([1, 2, 3, 4]);
-print(reversedArray)
-```
-output
-```
-[4, 3, 2, 1]
+If you would rather not touch globals, destructure what you need. The module is also a function that installs the globals and returns the API, so the old style still works:
+
+```js
+const {range, zip, sorted} = require('pythonicjs')
+const py = require('pythonicjs')()   // py.sum, py.len, ...
+require('pythonicjs').install(myObject)  // install onto your own object
 ```
 
-## Type Cast Operations
-### Syntax: ```str(object)```
-Converts an object to a string.
+### Browser
 
-### Syntax: ```int(string)```
-Converts a string to an integer
-
-### Syntax: ```float(string)```
-Converts a string to a float
-
-
-
-## Utility Functions
-### Syntax: ```timestamp()```
-Returns the current timestamp in ISO format.
-```
-2023-11-12T12:34:56.789Z
+```html
+<script src="https://unpkg.com/pythonicjs@latest"></script>
+<script>
+    print(sum(range(5)))     // 10
+    pythonicjs.len('hello')  // 5, the API is also available as window.pythonicjs
+</script>
 ```
 
+Note that the global `print` replaces the browser's `window.print`. The same file is published as [pythonicjs-web](https://github.com/KrishnaMBhattarai/pythonicjs-web).
 
-## Object Functions
-### Syntax: ```keys(object)``` 
-Returns an array of keys in an object.
+### Keyword arguments
 
-### Syntax: ```values(object)``` 
-Returns an array of values in an object.
+JavaScript has no keyword arguments, so functions that take them in Python accept a trailing options object:
 
-### Syntax: ```copy(object)``` 
-Creates a shallow copy of an object or array.
-
-### Syntax: ```deepcopy(object)``` 
-Creates a deep copy of an object or array.
-
-### Syntax: ```is_empty(object)``` 
-Checks if an object is empty.
-
-### Syntax: ```not(object)``` 
-Returns a Boolean - a logical negation of the object, just like in Python. 
-Returns true if the object is null or undefined or has length 0 
-```
-not('')            // true
-not ("")           // true
-
-not([])            // true
-not({})            // true
-
-not(null)          // true
-not(undefined)     // true
-
-not(0)             // true
-not(1)             // false
-not(-3.5)          // false
-not(-0.00000001)   // false
-not([1, 2])        // false
-not({"a":"b"})     // false
+```js
+sorted(people, {key: p => p.age, reverse: true})
+max(words, {key: len})
+min([], {default: 0})
 ```
 
-### Syntax: ```is_null(object)``` 
-Returns a Boolean by checking if an object is null.
+## Reference
 
-### Syntax: ```is_undefined(object)``` 
-Returns a Boolean by checking if an object is undefined.
+### Printing
 
-### Syntax: ```equals(object1, object2)``` 
-Returns a Boolean by checking if an object is equal to another object
+| Function | Description |
+| --- | --- |
+| `print(...values)` | Prints values to the console. |
+| `pprint(object)` | Pretty-prints an object as indented JSON. |
+| `pprintr(object)` | Returns the pretty-printed JSON string instead of printing it. |
+| `log(...values)` | Prints with a timestamp: `2023-11-12T16:36:11.004Z ::==> message`. |
+| `timestamp()` | Current time as an ISO string. |
 
-### Syntax: ```index(object, item)``` 
-Returns the index of the specified item within the object array.
-If the item is not found in the array, it returns -1.
+### Types and conversions
 
-### Syntax: ```first(array)``` 
-Returns the first item of the array
+| Function | Description |
+| --- | --- |
+| `type(x)` | `typeof x`, but returns `'array'` for arrays and `'null'` for `null`. |
+| `str(x)` | Converts anything to a string, including `null` and `undefined`. |
+| `int(x, base = 10)` | Truncates numbers; parses strings strictly (`'12px'` throws, like Python's `ValueError`). Understands `0x`/`0o`/`0b` prefixes, `base = 0` and `_` separators. |
+| `float(x)` | Parses strings strictly; understands `'inf'`, `'-inf'` and `'nan'`. |
+| `bool(x)` | Python truthiness: empty arrays, objects, Maps, Sets and strings are `false`. |
+| `not(x)` | `!bool(x)`. |
+| `list(iterable)` | Array from a string, Set, Map or other iterable; a plain object gives its keys. |
+| `chr(code)` / `ord(char)` | Unicode code point conversions. |
+| `hex(n)` / `oct(n)` / `bin(n)` | `'0xff'`, `'0o10'`, `'0b101'`; negative numbers give `'-0x1'`. BigInts work too. |
+| `base(n, radix)` | `n.toString(radix)`. |
+| `is_array(x)`, `is_null(x)`, `is_undefined(x)` | Type checks. |
 
-### Syntax: ```last(array)``` 
-Returns the last item of the array
+### Math
 
-### Syntax: ```remove(array, item)``` 
-Returns a new array with all instances of item removed
+| Function | Description |
+| --- | --- |
+| `abs(x)` | Absolute value. |
+| `pow(x, y, mod?)` | `x ** y`, or exact modular exponentiation for integers when `mod` is given. |
+| `divmod(a, b)` | `[Math.floor(a / b), a mod b]` with Python's sign rules. |
+| `round(x, ndigits?)` | Rounds to an integer or to `ndigits` decimal places (half rounds up, as in `Math.round`). |
+| `sum(iterable, start = 0)` | Sum of the items. |
+| `max(...)` / `min(...)` | `max(iterable)`, `max(a, b, c)`, or `max(iterable, {key, default})`. |
+| `avg(list)` / `mean(list)` | Arithmetic mean. |
+| `random(a, b)` / `randint(a, b)` | Random integer in `[a, b]`. |
+| `choice(seq)` | Random item. |
+| `shuffle(array)` | Shuffles in place and returns the array. |
 
-### Syntax: ```difference(a, b)``` 
-Returns a new array with elements in array 'a' but not in array 'b'
+### Sequences and iteration
 
-### Syntax: ```union(a, b)``` 
-Returns a new array with unique items present in one or more arrays
+| Function | Description |
+| --- | --- |
+| `len(x)` | Length of a string or array, size of a Map or Set, or key count of an object. |
+| `range(stop)` / `range(start, stop, step = 1)` | Array of integers, like Python's `range`. A zero step or non-integer argument throws. |
+| `sorted(iterable, key?, reverse?)` | New sorted array (stable). Also `sorted(iterable, {key, reverse})`. Strings sort by code point, numbers numerically, dates by time, arrays like tuples. Mixing types Python can't compare (like strings and numbers) throws a `TypeError`. A plain object returns a new object with sorted keys. |
+| `reversed(seq)` | New reversed array; works on strings. |
+| `enumerate(iterable, start = 0)` | `[[0, a], [1, b], ...]`. |
+| `zip(...iterables)` | Groups items by position, stopping at the shortest. |
+| `map(fn, ...iterables)` | Like Python's `map`, including several iterables. |
+| `filter(fn, iterable)` | Items where `fn(item)` is truthy; `filter(null, xs)` keeps truthy items. |
+| `any(iterable)` / `all(iterable)` | With Python truthiness. |
+| `flatten(list)` | Flattens nested arrays. |
+| `index(seq, item)` | Position of `item` (compared by value in arrays), or `-1`. |
+| `first(array)` / `last(array)` | First or last item. |
+| `unique(list)` | Items without duplicates, order kept. |
+| `remove(array, item)` | New array without any `item`. |
+| `without(list, ...values)` | New array without any of `values`. |
+| `difference(a, b)` | Items of `a` not in `b`. |
+| `union(...lists)` | Unique items from all lists. |
+| `intersection(...lists)` | Unique items common to all lists. |
 
-### Syntax: ```intersection(a, b)``` 
-Returns a new array with unique items that are common in both arrays
+### List methods (modify the array in place)
 
-### Syntax: ```without(list, values)``` 
-Returns a new that includes only the elements from the original array that are not present in the values array
+| Function | Python equivalent |
+| --- | --- |
+| `append(array, item)` | `array.append(item)` |
+| `extend(array, iterable)` | `array.extend(iterable)` |
+| `insert(array, index, item)` | `array.insert(index, item)` |
+| `pop(array, index?)` | `array.pop(index)`; supports negative indexes and throws on an empty list. |
+| `clear(x)` | Empties an array, Map, Set or object. |
+| `count(seq, item)` | Occurrences of `item` in an array (compared by value), or of a substring in a string. |
 
-### Syntax: ```base(number, base)```
-It converts the given number to a string representation in the specified base
+### String methods
 
-### Syntax: ```range(start, end, step )```
-Returns an array from start to end in step increments just like the range function in Python
-It can be supplied 1 parameter, 2 parameters (start, end), or 3 parameters (start, end, step) 
+| Function | Python equivalent |
+| --- | --- |
+| `strip(s, chars?)` | `s.strip(chars)` |
+| `lstrip(s, chars?)` | `s.lstrip(chars)` |
+| `rstrip(s, chars?)` | `s.rstrip(chars)` |
 
+### Objects
 
-### Syntax: ```reverse(array )```
-Returns an array that is reversed
+| Function | Description |
+| --- | --- |
+| `keys(obj)` / `values(obj)` / `items(obj)` | Like `dict.keys()`, `.values()`, `.items()`; Maps work too. |
+| `copy(x)` | Shallow copy of an array, object (keeping its class), Date, Map, Set or typed array. |
+| `deepcopy(x)` | Deep copy that keeps Dates, Maps, Sets, RegExps, typed arrays, classes and circular references. |
+| `equals(a, b)` | Deep equality that ignores key order, like `==` on Python lists and dicts. |
+| `is_empty(x)` | `true` for `null`, `undefined`, and empty strings, arrays, objects, Maps and Sets. |
+| `getattr(obj, name, default?)` | Property value, or `default` if it is missing. |
+| `setattr(obj, name, value)` | Sets a property. |
+| `hasattr(obj, name)` | Whether the property exists; works on primitives. |
+| `invert(obj)` | Swaps keys and values. |
 
-### Syntax: ```filter(operation, array )```
-Filter the elements of the input array based on the condition specified by the operation function. 
-The operation function is expected to be a callback function that returns a boolean value
+## Upgrading from 4.x
 
-### Syntax: ```hex(a)```
-Converts the unsigned decimal number 'a' to its hexadecimal representation with a "0x" prefix
+See [CHANGELOG.md](CHANGELOG.md). The main behaviour changes are that `int` and `float` throw on invalid strings instead of returning `NaN`, `type(null)` is `'null'`, `hex` of negative numbers returns `'-0x...'`, `pop` throws on an empty list, `range` requires integers, and `sorted`/`max`/`min` throw a `TypeError` when values can't be compared.
 
-### Syntax: ```map(operation, array )```
-applies the provided operation function to each element of the array and returns a new array containing the results.
+## Development
 
-### Syntax: ```getattr(obj, name)```
-retrieves the value of the property with the specified name from the given obj.
+```bash
+npm install
+npm test
+```
 
-### Syntax: ```setattr(obj, name, value)```
-sets the value of the property with the specified name to the given value in the provided obj
+## License
 
-### Syntax: ```hasattr(obj, name)```
-returns a boolean by checking if the specified name is a property in the given obj and 
-
-### Syntax: ```invert(obj)```
-returns an object with key and values inverted
-
-### Syntax: ```random(min, max)```
-returns a random number between min and max 
-
-### Syntax: ```round(number, ndigits = null)```
-rounds the number (to ndigits if supplied)
-
-## To do 
-- Categorize functionality a bit better
-- write more tests for the functions
-- Improve documentation
+MIT

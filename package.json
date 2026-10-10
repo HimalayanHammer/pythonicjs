@@ -1,28 +1,43 @@
 {
   "name": "pythonicjs",
-  "version": "4.0.0",
-  "description": "A nodejs library for those that like python",
+  "version": "5.0.0",
+  "description": "Python's built-in functions for JavaScript: print, len, range, sorted, zip, enumerate and more, in Node.js and the browser",
   "main": "pythonicjs.js",
-  "dependencies": {
-    "chai": "^4.3.10",
-    "mocha": "^10.2.0"
-  },
+  "unpkg": "pythonicjs.js",
+  "jsdelivr": "pythonicjs.js",
+  "files": [
+    "pythonicjs.js",
+    "CHANGELOG.md"
+  ],
   "scripts": {
-    "test": "node pythonicjsTest.js"
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "mocha": "^10.8.2"
+  },
+  "engines": {
+    "node": ">=12"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Qrishna/pythonicjs.git"
+    "url": "git+https://github.com/KrishnaMBhattarai/pythonicjs.git"
   },
   "keywords": [
+    "python",
+    "pythonic",
     "pythonicjs",
-    "pythonicnodejs",
-    "pythonic javascript"
+    "builtins",
+    "range",
+    "zip",
+    "enumerate",
+    "sorted",
+    "utility"
   ],
-  "author": "Krishna Bhattarai<qrishna>",
+  "author": "Krishna Bhattarai",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Qrishna/pythonicjs/issues"
+    "url": "https://github.com/KrishnaMBhattarai/pythonicjs/issues"
   },
-  "homepage": "https://github.com/Qrishna/pythonicjs#readme"
+  "homepage": "https://github.com/KrishnaMBhattarai/pythonicjs#readme"
 }
