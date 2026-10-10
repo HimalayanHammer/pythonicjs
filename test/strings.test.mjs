@@ -77,10 +77,15 @@ describe('strings', () => {
 
     it('joins any iterable of strings, including Sets, generators and object keys', () => {
         expect(join('-', new Set(['a', 'b']))).to.equal('a-b')
-        expect(join('', (function* () {
-            yield 'x'
-            yield 'y'
-        })())).to.equal('xy')
+        expect(
+            join(
+                '',
+                (function* () {
+                    yield 'x'
+                    yield 'y'
+                })(),
+            ),
+        ).to.equal('xy')
         expect(join(',', {a: 1, b: 2})).to.equal('a,b')
         expect(join(',', new Map([['k', 1]]))).to.equal('k')
         expect(() => join(',', ['a', 1])).to.throw(TypeError, 'sequence item 1: expected str instance, int found')

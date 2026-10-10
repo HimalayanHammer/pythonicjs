@@ -286,7 +286,9 @@ function layoutNumber(
         grouped = grouped.toUpperCase()
     }
     const fill = spec.fill
-    return fill.repeat(left) + sign + pre + fill.repeat(middle) + grouped + (hasDecimal ? '.' : '') + remainder + fill.repeat(right)
+    return (
+        fill.repeat(left) + sign + pre + fill.repeat(middle) + grouped + (hasDecimal ? '.' : '') + remainder + fill.repeat(right)
+    )
 }
 
 function groupingFor(spec: Spec): [number, string] {
@@ -323,7 +325,14 @@ function dtoa(x: number, mode: 0 | 2 | 3, ndigits: number): {digits: string; dec
 }
 
 /** CPython's PyOS_double_to_string for the codes e E f F g G r. */
-function doubleToString(value: number, code: string, precision: number, alternate: boolean, addDot0: boolean, noNegZero: boolean): string {
+function doubleToString(
+    value: number,
+    code: string,
+    precision: number,
+    alternate: boolean,
+    addDot0: boolean,
+    noNegZero: boolean,
+): string {
     const upper = code === 'E' || code === 'F' || code === 'G'
     const kind = code.toLowerCase()
     let digitsWanted = precision

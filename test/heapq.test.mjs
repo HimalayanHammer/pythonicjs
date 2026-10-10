@@ -1,6 +1,20 @@
 import {expect} from 'chai'
 import {heapq, IndexError} from 'pythonicjs'
-import {heapify, heapify_max, heappop, heappop_max, heappush, heappush_max, heappushpop, heappushpop_max, heapreplace, heapreplace_max, merge, nlargest, nsmallest} from 'pythonicjs/heapq'
+import {
+    heapify,
+    heapify_max,
+    heappop,
+    heappop_max,
+    heappush,
+    heappush_max,
+    heappushpop,
+    heappushpop_max,
+    heapreplace,
+    heapreplace_max,
+    merge,
+    nlargest,
+    nsmallest,
+} from 'pythonicjs/heapq'
 
 const isMinHeap = (h) => h.every((x, i) => i === 0 || h[(i - 1) >> 1] <= x)
 const isMaxHeap = (h) => h.every((x, i) => i === 0 || h[(i - 1) >> 1] >= x)

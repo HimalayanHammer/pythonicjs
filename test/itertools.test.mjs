@@ -19,7 +19,10 @@ import {
 } from 'pythonicjs/itertools'
 
 const isLazyIterator = (it) =>
-    typeof it.next === 'function' && typeof it[Symbol.iterator] === 'function' && it[Symbol.iterator]() === it && !Array.isArray(it)
+    typeof it.next === 'function' &&
+    typeof it[Symbol.iterator] === 'function' &&
+    it[Symbol.iterator]() === it &&
+    !Array.isArray(it)
 
 describe('itertools', () => {
     it('is exposed as a namespace and as a subpath module', () => {
@@ -85,7 +88,15 @@ describe('itertools', () => {
         expect(perms.next().value.slice(-3)).to.deep.equal([27, 28, 29])
         expect(perms.next().value.slice(-3)).to.deep.equal([27, 29, 28])
         expect(product([0, 1], {repeat: 60}).next().value).to.have.length(60)
-        expect(take(2, combinations(Array.from({length: 60}, (_, i) => i), 30))).to.have.length(2)
+        expect(
+            take(
+                2,
+                combinations(
+                    Array.from({length: 60}, (_, i) => i),
+                    30,
+                ),
+            ),
+        ).to.have.length(2)
     })
 
     it('reads its inputs lazily', () => {
@@ -103,8 +114,14 @@ describe('itertools', () => {
     })
 
     it('checks arguments eagerly, like CPython', () => {
-        expect(() => islice([1], -1)).to.throw(ValueError, 'Stop argument for islice() must be None or an integer: 0 <= x <= sys.maxsize.')
-        expect(() => islice([1], -1, 2)).to.throw(ValueError, 'Indices for islice() must be None or an integer: 0 <= x <= sys.maxsize.')
+        expect(() => islice([1], -1)).to.throw(
+            ValueError,
+            'Stop argument for islice() must be None or an integer: 0 <= x <= sys.maxsize.',
+        )
+        expect(() => islice([1], -1, 2)).to.throw(
+            ValueError,
+            'Indices for islice() must be None or an integer: 0 <= x <= sys.maxsize.',
+        )
         expect(() => islice([1], 0, 2, 0)).to.throw(ValueError, 'Step for islice() must be a positive integer or None.')
         expect(() => combinations([1], -1)).to.throw(ValueError, 'r must be non-negative')
         expect(() => batched([1], 0)).to.throw(ValueError, 'n must be at least one')

@@ -65,13 +65,18 @@ for (let i = 0; i < 400; i++) {
 
 // strings, floats and tuples
 for (let i = 0; i < 60; i++) {
-    const words = Array.from({length: r.int(0, 8)}, () => r.pick(['a', 'ab', 'b', 'B', 'é', 'z', '', 'aa'])).sort((p, q) => (p < q ? -1 : p > q ? 1 : 0))
+    const words = Array.from({length: r.int(0, 8)}, () => r.pick(['a', 'ab', 'b', 'B', 'é', 'z', '', 'aa'])).sort((p, q) =>
+        p < q ? -1 : p > q ? 1 : 0,
+    )
     const w = r.pick(['a', 'ab', 'c', '', 'zz', 'B'])
     pair(`bisect.bisect_left(${js(words)}, ${js(w)})`, `bisect.bisect_left(${py(words)}, ${py(w)})`)
     pair(`bisect.bisect_right(${js(words)}, ${js(w)})`, `bisect.bisect_right(${py(words)}, ${py(w)})`)
     const pairs = Array.from({length: r.int(0, 8)}, () => [r.int(0, 3), r.int(0, 3)]).sort((p, q) => p[0] - q[0] || p[1] - q[1])
     const t = [r.int(0, 3), r.int(0, 3)]
-    pair(`(() => { const a = ${js(pairs)}; bisect.insort(a, ${js(t)}); return a })()`, `(lambda a: (bisect.insort(a, ${py(t)}), a)[1])(${py(pairs)})`)
+    pair(
+        `(() => { const a = ${js(pairs)}; bisect.insort(a, ${js(t)}); return a })()`,
+        `(lambda a: (bisect.insort(a, ${py(t)}), a)[1])(${py(pairs)})`,
+    )
 }
 for (let i = 0; i < 40; i++) {
     const xs = Array.from({length: r.int(0, 10)}, () => r.int(-8, 8) / 2).sort((a, b) => a - b)

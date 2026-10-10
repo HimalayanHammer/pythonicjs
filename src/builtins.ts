@@ -98,8 +98,8 @@ export function callable(object: unknown): boolean {
 }
 
 /** Converts anything to a string (JavaScript's String()). Use repr() for Python's repr. */
-export function str(object?: unknown): string {
-    return arguments.length === 0 ? '' : String(object)
+export function str(...object: unknown[]): string {
+    return object.length === 0 ? '' : String(object[0])
 }
 
 function toSafeInteger(value: bigint): number {
@@ -234,7 +234,7 @@ export function bool(object?: unknown): boolean {
         if (object instanceof Range) {
             return object.length > 0
         }
-        const custom = (object as {__bool__?: () => boolean; __len__?: () => number})
+        const custom = object as {__bool__?: () => boolean; __len__?: () => number}
         if (typeof custom.__bool__ === 'function') {
             return custom.__bool__()
         }
@@ -395,7 +395,7 @@ export function divmod(a: number | bigint, b: number | bigint): [number | bigint
             throw new ZeroDivisionError('integer division or modulo by zero')
         }
         let q = a / b
-        if ((a % b !== BigInt(0)) && (a < 0 !== b < 0)) {
+        if (a % b !== BigInt(0) && a < 0 !== b < 0) {
             q -= BigInt(1)
         }
         return [q, a - q * b]
@@ -403,7 +403,9 @@ export function divmod(a: number | bigint, b: number | bigint): [number | bigint
     const x = Number(a)
     const y = Number(b)
     if (y === 0) {
-        throw new ZeroDivisionError(Number.isInteger(x) && Number.isInteger(y) ? 'integer division or modulo by zero' : 'float divmod()')
+        throw new ZeroDivisionError(
+            Number.isInteger(x) && Number.isInteger(y) ? 'integer division or modulo by zero' : 'float divmod()',
+        )
     }
     // CPython's float_divmod
     let mod = x % y
@@ -682,7 +684,11 @@ function sortArgs<T>(key: Key<T> | SortOptions<T>, reverse: boolean): [Key<T>, b
  * a new object with its keys sorted.
  */
 export function sorted<T>(iterable: Iterable<T>, key?: Key<T> | SortOptions<T>, reverse?: boolean): T[]
-export function sorted<V>(object: Record<string, V>, key?: Key<string> | SortOptions<string>, reverse?: boolean): Record<string, V>
+export function sorted<V>(
+    object: Record<string, V>,
+    key?: Key<string> | SortOptions<string>,
+    reverse?: boolean,
+): Record<string, V>
 export function sorted(iterable: unknown, key: unknown = null, reverse = false): unknown {
     const [keyFn, rev] = sortArgs(key as Key<unknown>, reverse)
     if (isPlainObject(iterable)) {
@@ -975,7 +981,7 @@ export function pop(container: unknown, index?: unknown, ...rest: unknown[]): un
         }
     } else if (container !== null && typeof container === 'object') {
         const object = container as Record<string, unknown>
-        if (Object.prototype.hasOwnProperty.call(object, index as string)) {
+        if (Object.hasOwn(object, index as string)) {
             const value = object[index as string]
             delete object[index as string]
             return value
@@ -1130,7 +1136,10 @@ export function deepcopy<T>(object: T, memo: Map<unknown, unknown> = new Map()):
     const make = (object.constructor as {_make?: (items: Iterable<unknown>) => T})?._make
     if (Array.isArray(object) && object.constructor !== Array && typeof make === 'function') {
         // namedtuples are frozen, so build a new one from deep-copied fields
-        const result = make.call(object.constructor, object.map((item) => deepcopy(item, memo)))
+        const result = make.call(
+            object.constructor,
+            object.map((item) => deepcopy(item, memo)),
+        )
         memo.set(object, result)
         return result
     }
@@ -1148,9 +1157,9 @@ export function equals(a: unknown, b: unknown): boolean {
 }
 
 /** obj[name], or `defaultValue` when the attribute is missing. */
-export function getattr<T = unknown>(obj: unknown, name: PropertyKey, defaultValue?: T): T {
-    if (arguments.length > 2 && !hasattr(obj, name)) {
-        return defaultValue as T
+export function getattr<T = unknown>(obj: unknown, name: PropertyKey, ...defaultValue: [T?]): T {
+    if (defaultValue.length > 0 && !hasattr(obj, name)) {
+        return defaultValue[0] as T
     }
     return (obj as Record<PropertyKey, T>)[name]
 }

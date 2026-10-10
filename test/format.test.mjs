@@ -112,7 +112,10 @@ describe('str_format', () => {
     it('raises the same errors as CPython', () => {
         expect(() => str_format('{', 1)).to.throw(ValueError, "Single '{' encountered in format string")
         expect(() => str_format('}', 1)).to.throw(ValueError, "Single '}' encountered in format string")
-        expect(() => str_format('{}{0}', 1, 2)).to.throw(ValueError, 'cannot switch from automatic field numbering to manual field specification')
+        expect(() => str_format('{}{0}', 1, 2)).to.throw(
+            ValueError,
+            'cannot switch from automatic field numbering to manual field specification',
+        )
         expect(() => str_format('{x}', {y: 1})).to.throw(KeyError, "'x'")
         expect(() => str_format('{0!z}', 1)).to.throw(ValueError, 'Unknown conversion specifier z')
     })

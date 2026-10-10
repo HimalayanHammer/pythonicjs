@@ -27,7 +27,7 @@ function mappingEntries<K, V>(x: unknown): Iterable<readonly [K, V]> | null {
 }
 
 /** The class name for repr: bundlers may rename the built-in classes, but not their subclasses' names. */
-function className(object: object, base: Function, name: string): string {
+function className(object: object, base: abstract new (...args: never[]) => unknown, name: string): string {
     return object.constructor === base ? name : object.constructor.name
 }
 
@@ -299,7 +299,9 @@ function fill<K, V>(map: Map<K, V>, source: unknown): void {
     }
     for (const entry of source as Iterable<unknown>) {
         if (!isIterable(entry) || typeof entry === 'string') {
-            throw new TypeError(`cannot convert dictionary update sequence element; '${typeName(entry)}' object is not a [key, value] pair`)
+            throw new TypeError(
+                `cannot convert dictionary update sequence element; '${typeName(entry)}' object is not a [key, value] pair`,
+            )
         }
         const pair = Array.from(entry)
         if (pair.length !== 2) {
@@ -875,9 +877,21 @@ const isIdentifier = (s: string) => /^[\p{L}\p{Nl}_][\p{L}\p{Nl}\p{Mn}\p{Mc}\p{N
  * Unlike Python, the field names 'length' and 'constructor' are rejected
  * (ValueError), and fields named like Array methods shadow those methods.
  */
-export function namedtuple<const F extends string, V = any>(typename: string, fieldNames: readonly F[], options?: NamedTupleOptions<V>): NamedTupleClass<F, V>
-export function namedtuple<V = any>(typename: string, fieldNames: string, options?: NamedTupleOptions<V>): NamedTupleClass<string, V>
-export function namedtuple(typename: string, fieldNames: string | readonly string[], options: NamedTupleOptions = {}): NamedTupleClass<string> {
+export function namedtuple<const F extends string, V = any>(
+    typename: string,
+    fieldNames: readonly F[],
+    options?: NamedTupleOptions<V>,
+): NamedTupleClass<F, V>
+export function namedtuple<V = any>(
+    typename: string,
+    fieldNames: string,
+    options?: NamedTupleOptions<V>,
+): NamedTupleClass<string, V>
+export function namedtuple(
+    typename: string,
+    fieldNames: string | readonly string[],
+    options: NamedTupleOptions = {},
+): NamedTupleClass<string> {
     let fields: string[] =
         typeof fieldNames === 'string'
             ? fieldNames
@@ -889,7 +903,8 @@ export function namedtuple(typename: string, fieldNames: string | readonly strin
     if (rename) {
         const seen = new Set<string>()
         fields = fields.map((name, index) => {
-            const bad = !isIdentifier(name) || PY_KEYWORDS.has(name) || name.startsWith('_') || seen.has(name) || RESERVED.has(name)
+            const bad =
+                !isIdentifier(name) || PY_KEYWORDS.has(name) || name.startsWith('_') || seen.has(name) || RESERVED.has(name)
             seen.add(name)
             return bad ? `_${index}` : name
         })
@@ -947,7 +962,8 @@ export function namedtuple(typename: string, fieldNames: string | readonly strin
             }
             if (values.length < required) {
                 const missing = fields.slice(values.length, required).map((f) => pyRepr(f))
-                const list = missing.length === 1 ? missing[0] : `${missing.slice(0, -1).join(', ')} and ${missing[missing.length - 1]}`
+                const list =
+                    missing.length === 1 ? missing[0] : `${missing.slice(0, -1).join(', ')} and ${missing[missing.length - 1]}`
                 throw new TypeError(
                     `${name}.__new__() missing ${missing.length} required positional argument${missing.length === 1 ? '' : 's'}: ${list}`,
                 )

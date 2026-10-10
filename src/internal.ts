@@ -6,7 +6,11 @@ import {floatRepr} from './numbers.js'
 export type Key<T> = ((item: T) => unknown) | null | undefined
 
 export function isIterable(object: unknown): object is Iterable<unknown> {
-    return object !== null && object !== undefined && typeof (object as {[Symbol.iterator]?: unknown})[Symbol.iterator] === 'function'
+    return (
+        object !== null &&
+        object !== undefined &&
+        typeof (object as {[Symbol.iterator]?: unknown})[Symbol.iterator] === 'function'
+    )
 }
 
 export function isPlainObject(object: unknown): object is Record<string, unknown> {
@@ -201,9 +205,7 @@ export function equals(a: unknown, b: unknown): boolean {
     if (keysA.length !== keysB.length) {
         return false
     }
-    return keysA.every(
-        (k) => Object.prototype.hasOwnProperty.call(b, k) && equals((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]),
-    )
+    return keysA.every((k) => Object.hasOwn(b, k) && equals((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]))
 }
 
 function isRangeLike(x: object): boolean {
@@ -232,7 +234,12 @@ export function adjustSlice(
         lo = start === null || start === undefined ? 0 : start < 0 ? Math.max(0, start + length) : Math.min(start, length)
         hi = stop === null || stop === undefined ? length : stop < 0 ? Math.max(0, stop + length) : Math.min(stop, length)
     } else {
-        lo = start === null || start === undefined ? length - 1 : start < 0 ? Math.max(-1, start + length) : Math.min(start, length - 1)
+        lo =
+            start === null || start === undefined
+                ? length - 1
+                : start < 0
+                  ? Math.max(-1, start + length)
+                  : Math.min(start, length - 1)
         hi = stop === null || stop === undefined ? -1 : stop < 0 ? Math.max(-1, stop + length) : Math.min(stop, length - 1)
     }
     let count = 0
@@ -333,7 +340,9 @@ export function pyRepr(x: unknown, seen: Set<unknown> = new Set()): string {
             return x.size === 0 ? 'set()' : `{${Array.from(x, (v) => pyRepr(v, seen)).join(', ')}}`
         }
         if (isPlainObject(x)) {
-            return `{${Object.entries(x).map(([k, v]) => `${stringRepr(k)}: ${pyRepr(v, seen)}`).join(', ')}}`
+            return `{${Object.entries(x)
+                .map(([k, v]) => `${stringRepr(k)}: ${pyRepr(v, seen)}`)
+                .join(', ')}}`
         }
         return String(x)
     } finally {

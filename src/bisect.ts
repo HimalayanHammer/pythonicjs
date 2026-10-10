@@ -15,7 +15,11 @@ export interface BisectOptions<T, K = T> {
     key?: ((item: T) => K) | null
 }
 
-type Args<T, K> = [lo?: number | BisectOptions<T, K>, hi?: number | null | BisectOptions<T, K>, key?: ((item: T) => K) | null | BisectOptions<T, K>]
+type Args<T, K> = [
+    lo?: number | BisectOptions<T, K>,
+    hi?: number | null | BisectOptions<T, K>,
+    key?: ((item: T) => K) | null | BisectOptions<T, K>,
+]
 
 interface Parsed<T, K> {
     lo: number
@@ -81,8 +85,19 @@ function left<T, K>(a: ArrayLike<T>, x: unknown, {lo, hi, key}: Parsed<T, K>): n
  * The index where x would be inserted to keep `a` sorted, after any entries
  * equal to x. With a key, x is compared to key(item), so pass the key of x.
  */
-export function bisect_right<T>(a: ArrayLike<T>, x: T, lo?: number | BisectOptions<T>, hi?: number | null | BisectOptions<T>): number
-export function bisect_right<T, K>(a: ArrayLike<T>, x: K, lo: number, hi: number | null | undefined, key: ((item: T) => K) | null): number
+export function bisect_right<T>(
+    a: ArrayLike<T>,
+    x: T,
+    lo?: number | BisectOptions<T>,
+    hi?: number | null | BisectOptions<T>,
+): number
+export function bisect_right<T, K>(
+    a: ArrayLike<T>,
+    x: K,
+    lo: number,
+    hi: number | null | undefined,
+    key: ((item: T) => K) | null,
+): number
 export function bisect_right<T, K>(a: ArrayLike<T>, x: K, options: BisectOptions<T, K>): number
 export function bisect_right<T, K>(a: ArrayLike<T>, x: unknown, ...args: Args<T, K>): number {
     return right(a, x, parse<T, K>(a, args))
@@ -92,8 +107,19 @@ export function bisect_right<T, K>(a: ArrayLike<T>, x: unknown, ...args: Args<T,
  * The index where x would be inserted to keep `a` sorted, before any entries
  * equal to x. With a key, x is compared to key(item), so pass the key of x.
  */
-export function bisect_left<T>(a: ArrayLike<T>, x: T, lo?: number | BisectOptions<T>, hi?: number | null | BisectOptions<T>): number
-export function bisect_left<T, K>(a: ArrayLike<T>, x: K, lo: number, hi: number | null | undefined, key: ((item: T) => K) | null): number
+export function bisect_left<T>(
+    a: ArrayLike<T>,
+    x: T,
+    lo?: number | BisectOptions<T>,
+    hi?: number | null | BisectOptions<T>,
+): number
+export function bisect_left<T, K>(
+    a: ArrayLike<T>,
+    x: K,
+    lo: number,
+    hi: number | null | undefined,
+    key: ((item: T) => K) | null,
+): number
 export function bisect_left<T, K>(a: ArrayLike<T>, x: K, options: BisectOptions<T, K>): number
 export function bisect_left<T, K>(a: ArrayLike<T>, x: unknown, ...args: Args<T, K>): number {
     return left(a, x, parse<T, K>(a, args))
@@ -103,14 +129,26 @@ export function bisect_left<T, K>(a: ArrayLike<T>, x: unknown, ...args: Args<T, 
 export const bisect = bisect_right
 
 /** Inserts x into the sorted array `a`, after any entries equal to x. With a key, key(x) is used. */
-export function insort_right<T>(a: T[], x: T, lo?: number | BisectOptions<T, unknown>, hi?: number | null | BisectOptions<T, unknown>, key?: ((item: T) => unknown) | null): void
+export function insort_right<T>(
+    a: T[],
+    x: T,
+    lo?: number | BisectOptions<T, unknown>,
+    hi?: number | null | BisectOptions<T, unknown>,
+    key?: ((item: T) => unknown) | null,
+): void
 export function insort_right<T>(a: T[], x: T, ...args: Args<T, unknown>): void {
     const parsed = parse<T, unknown>(a, args)
     a.splice(right(a, parsed.key ? parsed.key(x) : x, parsed), 0, x)
 }
 
 /** Inserts x into the sorted array `a`, before any entries equal to x. With a key, key(x) is used. */
-export function insort_left<T>(a: T[], x: T, lo?: number | BisectOptions<T, unknown>, hi?: number | null | BisectOptions<T, unknown>, key?: ((item: T) => unknown) | null): void
+export function insort_left<T>(
+    a: T[],
+    x: T,
+    lo?: number | BisectOptions<T, unknown>,
+    hi?: number | null | BisectOptions<T, unknown>,
+    key?: ((item: T) => unknown) | null,
+): void
 export function insort_left<T>(a: T[], x: T, ...args: Args<T, unknown>): void {
     const parsed = parse<T, unknown>(a, args)
     a.splice(left(a, parsed.key ? parsed.key(x) : x, parsed), 0, x)

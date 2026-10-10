@@ -8,7 +8,9 @@ import {expect} from 'chai'
 import {createContext, findPython, runJs, runPython} from './cpython/harness.mjs'
 
 const dir = join(dirname(fileURLToPath(import.meta.url)), 'cpython')
-const files = readdirSync(dir).filter((f) => f.endsWith('.cases.mjs')).sort()
+const files = readdirSync(dir)
+    .filter((f) => f.endsWith('.cases.mjs'))
+    .sort()
 const suites = await Promise.all(files.map(async (f) => [f, (await import(pathToFileURL(join(dir, f)).href)).default]))
 
 const python = findPython()
@@ -42,7 +44,9 @@ describe('matches CPython', function () {
                     try {
                         expect(actual).to.deep.equal(expected)
                     } catch {
-                        failures.push(`${c.name ?? c.js}\n      js: ${c.js}\n      py: ${c.py}\n      expected ${JSON.stringify(expected)}\n      got      ${JSON.stringify(actual)}`)
+                        failures.push(
+                            `${c.name ?? c.js}\n      js: ${c.js}\n      py: ${c.py}\n      expected ${JSON.stringify(expected)}\n      got      ${JSON.stringify(actual)}`,
+                        )
                     }
                 })
                 expect(failures, `\n${failures.slice(0, 25).join('\n')}\n(${failures.length} failing)`).to.have.length(0)

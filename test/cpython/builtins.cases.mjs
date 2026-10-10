@@ -30,32 +30,111 @@ for (let i = 0; i < 100; i++) {
 }
 
 // int and float parsing
-for (const s of ['42', ' -42 ', '+7', '1_000', '0x1f', '0b101', '0o17', '-0x1f', '12px', '', ' ', '1__0', '_1', '1_', '3.5', '١٢', '00', '0_0', '9007199254740993', '-123456789012345678901234567890']) {
+for (const s of [
+    '42',
+    ' -42 ',
+    '+7',
+    '1_000',
+    '0x1f',
+    '0b101',
+    '0o17',
+    '-0x1f',
+    '12px',
+    '',
+    ' ',
+    '1__0',
+    '_1',
+    '1_',
+    '3.5',
+    '١٢',
+    '00',
+    '0_0',
+    '9007199254740993',
+    '-123456789012345678901234567890',
+]) {
     pair(`int(${js(s)})`, `int(${py(s)})`)
     pair(`int(${js(s)}, 0)`, `int(${py(s)}, 0)`)
     pair(`int(${js(s)}, 16)`, `int(${py(s)}, 16)`)
 }
-for (const [s, b] of [['z', 36], ['Z', 36], ['10', 2], ['12', 2], ['777', 8], ['zz', 37], ['1', 1], ['0x10', 16], ['0x10', 10], ['010', 0]]) {
+for (const [s, b] of [
+    ['z', 36],
+    ['Z', 36],
+    ['10', 2],
+    ['12', 2],
+    ['777', 8],
+    ['zz', 37],
+    ['1', 1],
+    ['0x10', 16],
+    ['0x10', 10],
+    ['010', 0],
+]) {
     pair(`int(${js(s)}, ${b})`, `int(${py(s)}, ${b})`)
 }
 for (const x of [3.9, -3.9, 0.5, -0.5, 1e20, -1e20, 2 ** 53 + 2, true, false]) {
     pair(`int(${js(x)})`, `int(${py(x)})`)
 }
-for (const s of ['3.14', ' 1e3 ', '.5', '5.', '-.5e-3', 'inf', '-Infinity', 'nan', '1_000.5', '1__0', '_1', '', 'abc', '1e', '0x10', '1.5.5', '+1E+2']) {
+for (const s of [
+    '3.14',
+    ' 1e3 ',
+    '.5',
+    '5.',
+    '-.5e-3',
+    'inf',
+    '-Infinity',
+    'nan',
+    '1_000.5',
+    '1__0',
+    '_1',
+    '',
+    'abc',
+    '1e',
+    '0x10',
+    '1.5.5',
+    '+1E+2',
+]) {
     pair(`float(${js(s)})`, `float(${py(s)})`)
 }
 
 // arithmetic
-for (const [a, b] of [[7, 2], [-7, 2], [7, -2], [-7, -2], [7.5, 2], [-7.5, 2], [7.5, -2], [0, 3], [1, 0], [5.5, 0], [1e300, 1e-300]]) {
+for (const [a, b] of [
+    [7, 2],
+    [-7, 2],
+    [7, -2],
+    [-7, -2],
+    [7.5, 2],
+    [-7.5, 2],
+    [7.5, -2],
+    [0, 3],
+    [1, 0],
+    [5.5, 0],
+    [1e300, 1e-300],
+]) {
     same(`divmod(${js(a)}, ${js(b)})`)
 }
-for (const [x, y, m] of [[3, 200, 1000000007], [2, 0, 1], [-2, 3, 5], [2, -1, 5], [3, -2, 7], [2, 3, -5], [4, -1, 8], [2, 3, 0], [12345, 6789, 99991]]) {
+for (const [x, y, m] of [
+    [3, 200, 1000000007],
+    [2, 0, 1],
+    [-2, 3, 5],
+    [2, -1, 5],
+    [3, -2, 7],
+    [2, 3, -5],
+    [4, -1, 8],
+    [2, 3, 0],
+    [12345, 6789, 99991],
+]) {
     same(`pow(${x}, ${y}, ${m})`)
 }
 same('pow(2, 10)')
 same('pow(2, -2)')
 same('pow(0, -1)')
-for (const xs of [[], [1, 2, 3], [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], [1e100, 1.5, -1e100], [0.1, 0.2, 0.3], [1e16, 1, 1, 1, 1]]) {
+for (const xs of [
+    [],
+    [1, 2, 3],
+    [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+    [1e100, 1.5, -1e100],
+    [0.1, 0.2, 0.3],
+    [1e16, 1, 1, 1, 1],
+]) {
     same(`sum(${js(xs)})`)
 }
 for (let i = 0; i < 100; i++) {
@@ -117,8 +196,8 @@ same("len('😀ab')")
 same('len(42)')
 same("enumerate(['a', 'b'], 1)")
 same("list(zip([1, 2, 3], 'ab'))")
-pair("zip([1, 2], [3], {strict: true})", 'list(zip([1, 2], [3], strict=True))')
-pair("zip([1], [3, 4], {strict: true})", 'list(zip([1], [3, 4], strict=True))')
+pair('zip([1, 2], [3], {strict: true})', 'list(zip([1, 2], [3], strict=True))')
+pair('zip([1], [3, 4], {strict: true})', 'list(zip([1], [3, 4], strict=True))')
 same("list(reversed('abc'))")
 same('any([0, "", []])')
 same('all([1, "a", [0]])')
@@ -149,13 +228,14 @@ for (const s of ['a', '😀', 'é', 'ab', '']) {
 for (const v of [[], [0], {}, '', 'a', 0, 0.0, 1, null]) {
     pair(`bool(${js(v)})`, `bool(${py(v)})`)
 }
-pair("list({a: 1, b: 2})", "list({'a': 1, 'b': 2})")
+pair('list({a: 1, b: 2})', "list({'a': 1, 'b': 2})")
 same("list('abc')")
-
-
 
 // zip and map stop at the shortest input, even when another is infinite
 cases.push({js: "zip(itertools.count(), 'abc')", py: "list(zip(itertools.count(), 'abc'))"})
-cases.push({js: 'map((a, b) => a * b, itertools.count(1), [10, 20])', py: 'list(map(lambda a, b: a * b, itertools.count(1), [10, 20]))'})
-cases.push({js: "zip([1], [2], [3, 4], {strict: true})", py: 'list(zip([1], [2], [3, 4], strict=True))'})
+cases.push({
+    js: 'map((a, b) => a * b, itertools.count(1), [10, 20])',
+    py: 'list(map(lambda a, b: a * b, itertools.count(1), [10, 20]))',
+})
+cases.push({js: 'zip([1], [2], [3, 4], {strict: true})', py: 'list(zip([1], [2], [3, 4], strict=True))'})
 export default cases

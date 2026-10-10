@@ -137,7 +137,11 @@ function splitOptions(args: unknown[]): [unknown[], Record<string, unknown>] {
     return [args, {}]
 }
 
-function* lazyFilter<T>(predicate: Predicate<T> | null | undefined, it: Iterator<T>, keep: boolean): Generator<T, void, undefined> {
+function* lazyFilter<T>(
+    predicate: Predicate<T> | null | undefined,
+    it: Iterator<T>,
+    keep: boolean,
+): Generator<T, void, undefined> {
     const test = predicate ?? bool
     for (let r = it.next(); !r.done; r = it.next()) {
         if (bool(test(r.value)) === keep) {
@@ -220,7 +224,11 @@ export function accumulate<T, U>(
     func: ((total: U, item: T) => U) | null | undefined,
     options: AccumulateOptions<U>,
 ): IterableIterator<U>
-export function accumulate<T, U>(iterable: Iterable<T>, func: ((total: U, item: T) => U) | null | undefined, initial: U): IterableIterator<U>
+export function accumulate<T, U>(
+    iterable: Iterable<T>,
+    func: ((total: U, item: T) => U) | null | undefined,
+    initial: U,
+): IterableIterator<U>
 export function accumulate(iterable: Iterable<unknown>, func?: unknown, initial?: unknown): IterableIterator<unknown> {
     let fn = func
     let init = initial
@@ -237,7 +245,11 @@ export function accumulate(iterable: Iterable<unknown>, func?: unknown, initial?
     return accumulateGen(it, (fn as ((a: unknown, b: unknown) => unknown) | null | undefined) ?? add, init ?? null)
 }
 
-function* accumulateGen(it: Iterator<unknown>, fn: (a: unknown, b: unknown) => unknown, initial: unknown): Generator<unknown, void, undefined> {
+function* accumulateGen(
+    it: Iterator<unknown>,
+    fn: (a: unknown, b: unknown) => unknown,
+    initial: unknown,
+): Generator<unknown, void, undefined> {
     let total: unknown
     let started = false
     if (initial !== null) {
@@ -421,7 +433,12 @@ function* grouper(s: GroupState, tgtkey: unknown, id: object): Generator<unknown
  * CPython consumes, so the rest of a shared iterator stays usable.
  */
 export function islice<T>(iterable: Iterable<T>, stop: number | null): IterableIterator<T>
-export function islice<T>(iterable: Iterable<T>, start: number | null, stop: number | null, step?: number | null): IterableIterator<T>
+export function islice<T>(
+    iterable: Iterable<T>,
+    start: number | null,
+    stop: number | null,
+    step?: number | null,
+): IterableIterator<T>
 export function islice<T>(iterable: Iterable<T>, ...args: (number | null | undefined)[]): IterableIterator<T> {
     if (args.length < 1 || args.length > 3) {
         throw new TypeError(`islice expected 2 to 4 arguments, got ${args.length + 1}`)
@@ -581,7 +598,9 @@ export interface ZipLongestOptions<F> {
  * Groups items by position until the longest input runs out, filling the
  * gaps with {fillvalue} (undefined by default, where Python uses None).
  */
-export function zip_longest<T extends Iterable<unknown>[]>(...iterables: T): IterableIterator<{[K in keyof T]: ElementOf<T[K]> | undefined}>
+export function zip_longest<T extends Iterable<unknown>[]>(
+    ...iterables: T
+): IterableIterator<{[K in keyof T]: ElementOf<T[K]> | undefined}>
 export function zip_longest<T extends Iterable<unknown>[], F>(
     ...args: [...T, ZipLongestOptions<F>]
 ): IterableIterator<{[K in keyof T]: ElementOf<T[K]> | F}>
@@ -795,7 +814,11 @@ export function nth<T, D = undefined>(iterable: Iterable<T>, n: number, defaultV
 }
 
 /** The first item for which predicate is truthy (the first truthy item without one), else the default (false). */
-export function first_true<T, D = false>(iterable: Iterable<T>, defaultValue: D = false as D, predicate?: Predicate<T> | null): T | D {
+export function first_true<T, D = false>(
+    iterable: Iterable<T>,
+    defaultValue: D = false as D,
+    predicate?: Predicate<T> | null,
+): T | D {
     const r = lazyFilter(predicate, getIter(iterable), true).next()
     return r.done ? defaultValue : r.value
 }

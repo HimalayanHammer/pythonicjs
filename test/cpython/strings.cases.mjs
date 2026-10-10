@@ -12,21 +12,115 @@ const r = rng(2024)
 // and line break, Latin/Greek/Cyrillic/CJK, digits of other scripts,
 // characters with special case mappings, combining marks and emoji.
 const ALPHABET = [
-    'a', 'b', 'c', 'A', 'B', 'Z', 'x', 'y', '0', '1', '9', ' ', ' ', ' ', '\t', '\n', '\r', '\r\n', '\x0b', '\x0c',
-    '\x1c', '\x1d', '\x1e', '\x1f', '\x85', '\xa0', ' ', ' ', ' ', '​', ' ', ' ',
-    ' ', ' ', '　', ',', '.', '-', '_', "'", '"', '\\', '\x00', '\x7f', 'é', 'É', 'ß', 'ẞ', 'Σ', 'σ',
-    'ς', 'İ', 'ı', 'ǅ', 'ǆ', 'Ǆ', 'ﬁ', 'ŉ', 'ǰ', 'ᾳ', 'ᾼ', 'µ', 'Ω', 'Ж', 'ж', 'ǈ', '一', '二', '万', '中', 'ア',
-    '٣', '߁', '२', '²', '½', 'Ⅻ', '①', '́', 'ͅ', '😀', '👍🏽', '𝟘', '𐐀', '𐐨', 'Ꭰ', 'ꭰ', 'ჰ', 'Ა',
+    'a',
+    'b',
+    'c',
+    'A',
+    'B',
+    'Z',
+    'x',
+    'y',
+    '0',
+    '1',
+    '9',
+    ' ',
+    ' ',
+    ' ',
+    '\t',
+    '\n',
+    '\r',
+    '\r\n',
+    '\x0b',
+    '\x0c',
+    '\x1c',
+    '\x1d',
+    '\x1e',
+    '\x1f',
+    '\x85',
+    '\xa0',
+    ' ',
+    ' ',
+    ' ',
+    '​',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    '　',
+    ',',
+    '.',
+    '-',
+    '_',
+    "'",
+    '"',
+    '\\',
+    '\x00',
+    '\x7f',
+    'é',
+    'É',
+    'ß',
+    'ẞ',
+    'Σ',
+    'σ',
+    'ς',
+    'İ',
+    'ı',
+    'ǅ',
+    'ǆ',
+    'Ǆ',
+    'ﬁ',
+    'ŉ',
+    'ǰ',
+    'ᾳ',
+    'ᾼ',
+    'µ',
+    'Ω',
+    'Ж',
+    'ж',
+    'ǈ',
+    '一',
+    '二',
+    '万',
+    '中',
+    'ア',
+    '٣',
+    '߁',
+    '२',
+    '²',
+    '½',
+    'Ⅻ',
+    '①',
+    '́',
+    'ͅ',
+    '😀',
+    '👍🏽',
+    '𝟘',
+    '𐐀',
+    '𐐨',
+    'Ꭰ',
+    'ꭰ',
+    'ჰ',
+    'Ა',
 ]
 const randomString = (maxLength = 12, alphabet = ALPHABET) =>
     Array.from({length: r.int(0, maxLength)}, () => r.pick(alphabet)).join('')
-const WORDS = ['', 'a', 'ab', 'b', ' ', ',', ', ', '--', 'é', '😀', 'Σ', 'aa', 'x']
 
 // ---------------------------------------------------------------------------
 // strip
 // ---------------------------------------------------------------------------
-const stripSamples = ['', '   ', '  hi  ', '\t\n hi \x0b\x0c\r', '\x1c\x1d\x1e\x1fx\x85\xa0', '　中　', '​x​',
-    'xxhixx', '😀a😀', 'abcba', ' a ']
+const stripSamples = [
+    '',
+    '   ',
+    '  hi  ',
+    '\t\n hi \x0b\x0c\r',
+    '\x1c\x1d\x1e\x1fx\x85\xa0',
+    '　中　',
+    '​x​',
+    'xxhixx',
+    '😀a😀',
+    'abcba',
+    ' a ',
+]
 for (const s of stripSamples) {
     for (const fn of ['strip', 'lstrip', 'rstrip']) {
         method(fn, s)
@@ -47,8 +141,22 @@ for (let i = 0; i < 150; i++) {
 // ---------------------------------------------------------------------------
 // split / rsplit
 // ---------------------------------------------------------------------------
-const splitSamples = ['', ' ', 'a', 'a b  c', '  a  b  c  ', 'a,b,,c,', ',a,', 'a\tb\nc\rd\x0be\x0cf\x1cg\x85h\xa0i　j',
-    '1<>2<>3', 'aaa', 'aaaa', '😀,😀,😀', 'a​b', ' x ']
+const splitSamples = [
+    '',
+    ' ',
+    'a',
+    'a b  c',
+    '  a  b  c  ',
+    'a,b,,c,',
+    ',a,',
+    'a\tb\nc\rd\x0be\x0cf\x1cg\x85h\xa0i　j',
+    '1<>2<>3',
+    'aaa',
+    'aaaa',
+    '😀,😀,😀',
+    'a​b',
+    ' x ',
+]
 for (const s of splitSamples) {
     for (const fn of ['split', 'rsplit']) {
         for (const sep of [null, ',', ' ', '<>', 'aa', 'a', '😀']) {
@@ -80,8 +188,22 @@ for (let i = 0; i < 300; i++) {
 // ---------------------------------------------------------------------------
 // splitlines
 // ---------------------------------------------------------------------------
-const lineSamples = ['', '\n', 'a', 'a\n', 'a\nb', 'a\r\nb', 'a\r\rb', '\r\n\r\n', 'a\n\nb\n', 'a\x0bb\x0cc\x1cd\x1de\x1ef\x85g h i',
-    'a\x1fb', 'a\xa0b', 'x\r', '\n\r']
+const lineSamples = [
+    '',
+    '\n',
+    'a',
+    'a\n',
+    'a\nb',
+    'a\r\nb',
+    'a\r\rb',
+    '\r\n\r\n',
+    'a\n\nb\n',
+    'a\x0bb\x0cc\x1cd\x1de\x1ef\x85g h i',
+    'a\x1fb',
+    'a\xa0b',
+    'x\r',
+    '\n\r',
+]
 for (const s of lineSamples) {
     method('splitlines', s)
     method('splitlines', s, true)
@@ -94,7 +216,14 @@ for (let i = 0; i < 100; i++) {
 // ---------------------------------------------------------------------------
 // join / partition
 // ---------------------------------------------------------------------------
-for (const [sep, items] of [['', []], [', ', ['a']], [', ', ['a', 'b', 'c']], ['', ['😀', 'é']], ['-', ['', '', '']], ['😀', ['a', 'b']]]) {
+for (const [sep, items] of [
+    ['', []],
+    [', ', ['a']],
+    [', ', ['a', 'b', 'c']],
+    ['', ['😀', 'é']],
+    ['-', ['', '', '']],
+    ['😀', ['a', 'b']],
+]) {
     pair(`join(${js(sep)}, ${js(items)})`, `${py(sep)}.join(${py(items)})`)
 }
 pair("join('-', 'abc')", "'-'.join('abc')")
@@ -176,7 +305,16 @@ for (const s of ['', 'abc', 'aaa', '😀😀', 'abab']) {
 }
 pair("removeprefix('a', null)", "'a'.removeprefix(None)")
 for (const s of ['', 'a', 'abc', 'aaaa', 'banana', '😀x😀']) {
-    for (const [old, rep] of [['', '-'], ['a', ''], ['a', 'XY'], ['aa', 'b'], ['an', '😀'], ['😀', ''], ['x', 'y'], ['', '']]) {
+    for (const [old, rep] of [
+        ['', '-'],
+        ['a', ''],
+        ['a', 'XY'],
+        ['aa', 'b'],
+        ['an', '😀'],
+        ['😀', ''],
+        ['x', 'y'],
+        ['', ''],
+    ]) {
         method('replace', s, old, rep)
         for (const n of [0, 1, 2, 3, 10, -1, -3]) {
             method('replace', s, old, rep, n)
@@ -244,9 +382,42 @@ for (let i = 0; i < 80; i++) {
 // ---------------------------------------------------------------------------
 // case conversions
 // ---------------------------------------------------------------------------
-const caseSamples = ['', 'hello world', 'HELLO WORLD', "they're bill's friends", 'hello-world_foo bar9baz', 'ΣΑΣ ΣΑΣ', 'ΣΑΣ.', 'aΣ', 'Σ',
-    'aΣb', 'aΣ́', 'Σ́', 'a.Σ', 'ǆungla ǆ', 'ǅ ǅǅ', 'ßtraße', 'ﬁnance ﬂow', 'ŉ', 'ǰ', 'ᾳ ᾼ ᾀ', 'İstanbul', 'ıi',
-    'ﬃ', 'µ', 'ẞ', 'Ꭰꭰ', 'ჰ Ა', '𐐀𐐨', 'aBc DeF', '1st 2nd', 'ǈ', 'ΆΣ', 'ΌΣΟΣ ΟΣ', 'xͅ']
+const caseSamples = [
+    '',
+    'hello world',
+    'HELLO WORLD',
+    "they're bill's friends",
+    'hello-world_foo bar9baz',
+    'ΣΑΣ ΣΑΣ',
+    'ΣΑΣ.',
+    'aΣ',
+    'Σ',
+    'aΣb',
+    'aΣ́',
+    'Σ́',
+    'a.Σ',
+    'ǆungla ǆ',
+    'ǅ ǅǅ',
+    'ßtraße',
+    'ﬁnance ﬂow',
+    'ŉ',
+    'ǰ',
+    'ᾳ ᾼ ᾀ',
+    'İstanbul',
+    'ıi',
+    'ﬃ',
+    'µ',
+    'ẞ',
+    'Ꭰꭰ',
+    'ჰ Ა',
+    '𐐀𐐨',
+    'aBc DeF',
+    '1st 2nd',
+    'ǈ',
+    'ΆΣ',
+    'ΌΣΟΣ ΟΣ',
+    'xͅ',
+]
 for (const s of caseSamples) {
     for (const fn of ['title', 'capitalize', 'swapcase', 'casefold', 'lower', 'upper']) {
         method(fn, s)
@@ -258,22 +429,88 @@ for (let i = 0; i < 300; i++) {
 }
 // Every character on its own, skipping surrogates and the characters that
 // Unicode 16 (which V8 knows) added or changed since CPython 3.13's Unicode 15.1.
-const UNICODE_16 = [[0x19b, 0x19b], [0x264, 0x264], [2199, 2199], [6990, 6991], [7039, 7039], [7305, 7306], [9255, 9257], [12772, 12773],
-    [42955, 42957], [42970, 42972], [67008, 67059], [68928, 68965], [68969, 68997], [69006, 69007], [69314, 69316], [69372, 69372],
-    [70528, 70537], [70539, 70539], [70542, 70542], [70544, 70581], [70583, 70592], [70594, 70594], [70597, 70597], [70599, 70602],
-    [70604, 70613], [70615, 70616], [70625, 70626], [71376, 71395], [72640, 72673], [72688, 72697], [73562, 73562], [78944, 82938],
-    [90368, 90425], [93504, 93561], [101631, 101631], [117760, 118009], [118016, 118451], [124368, 124410], [124415, 124415],
-    [129202, 129211], [129216, 129217], [129673, 129673], [129679, 129679], [129726, 129726], [129734, 129734], [129756, 129756],
-    [129759, 129759], [129769, 129769], [129995, 130031]]
+const UNICODE_16 = [
+    [0x19b, 0x19b],
+    [0x264, 0x264],
+    [2199, 2199],
+    [6990, 6991],
+    [7039, 7039],
+    [7305, 7306],
+    [9255, 9257],
+    [12772, 12773],
+    [42955, 42957],
+    [42970, 42972],
+    [67008, 67059],
+    [68928, 68965],
+    [68969, 68997],
+    [69006, 69007],
+    [69314, 69316],
+    [69372, 69372],
+    [70528, 70537],
+    [70539, 70539],
+    [70542, 70542],
+    [70544, 70581],
+    [70583, 70592],
+    [70594, 70594],
+    [70597, 70597],
+    [70599, 70602],
+    [70604, 70613],
+    [70615, 70616],
+    [70625, 70626],
+    [71376, 71395],
+    [72640, 72673],
+    [72688, 72697],
+    [73562, 73562],
+    [78944, 82938],
+    [90368, 90425],
+    [93504, 93561],
+    [101631, 101631],
+    [117760, 118009],
+    [118016, 118451],
+    [124368, 124410],
+    [124415, 124415],
+    [129202, 129211],
+    [129216, 129217],
+    [129673, 129673],
+    [129679, 129679],
+    [129726, 129726],
+    [129734, 129734],
+    [129756, 129756],
+    [129759, 129759],
+    [129769, 129769],
+    [129995, 130031],
+]
 const skip = JSON.stringify(UNICODE_16)
-for (const [lo, hi] of [[0, 0x10000], [0x10000, 0x20000], [0x20000, 0x110000]]) {
+for (const [lo, hi] of [
+    [0, 0x10000],
+    [0x10000, 0x20000],
+    [0x20000, 0x110000],
+]) {
     const jsChars = `const skip = new Set(); for (const [a, b] of ${skip}) { for (let i = a; i <= b; i++) skip.add(i) }
         const out = []; for (let i = ${lo}; i < ${hi}; i++) { if ((i < 0xd800 || i >= 0xe000) && !skip.has(i)) out.push(String.fromCodePoint(i)) }`
     const pyChars = `skip = set().union(*[range(a, b + 1) for a, b in ${skip}])\nchars = [chr(i) for i in range(${lo}, ${hi}) if not (0xd800 <= i < 0xe000) and i not in skip]`
-    const fns = lo === 0
-        ? ['title', 'capitalize', 'swapcase', 'casefold', 'lower', 'upper', 'isdigit', 'isdecimal', 'isnumeric', 'isalpha', 'isalnum',
-            'isspace', 'isupper', 'islower', 'istitle', 'isidentifier', 'isascii']
-        : ['title', 'casefold', 'upper', 'lower', 'isdigit', 'isnumeric', 'isalpha', 'isupper', 'isidentifier']
+    const fns =
+        lo === 0
+            ? [
+                  'title',
+                  'capitalize',
+                  'swapcase',
+                  'casefold',
+                  'lower',
+                  'upper',
+                  'isdigit',
+                  'isdecimal',
+                  'isnumeric',
+                  'isalpha',
+                  'isalnum',
+                  'isspace',
+                  'isupper',
+                  'islower',
+                  'istitle',
+                  'isidentifier',
+                  'isascii',
+              ]
+            : ['title', 'casefold', 'upper', 'lower', 'isdigit', 'isnumeric', 'isalpha', 'isupper', 'isidentifier']
     for (const fn of fns) {
         pair(`${jsChars}\n return out.map((c) => ${fn}(c))`, `${pyChars}\nresult = [c.${fn}() for c in chars]`)
     }
@@ -282,33 +519,132 @@ for (const [lo, hi] of [[0, 0x10000], [0x10000, 0x20000], [0x20000, 0x110000]]) 
 // ---------------------------------------------------------------------------
 // predicates
 // ---------------------------------------------------------------------------
-const predicateSamples = ['', 'abc', 'ABC', 'Abc', 'aBC', 'Hello World', 'Hello world', 'HELLO', 'hello 1', '123', '١٢٣', '²', '½', 'Ⅻ',
-    '一二三', '①', '12a', ' ', '\t\n', '\x1c', '\x1f', '​', '\xa0', 'abc_1', '_', '1abc', 'é', 'ǅ', 'ǅa', 'Ǆa', 'ǆ', 'a ǅ',
-    'This Is', 'This is', "They'Re", 'A1B', 'a1b', '1', 'ß', 'ΣΑΣ', 'Σας', '́', 'á', 'Ab Cd', 'AB CD', '😀', 'a😀',
-    'if', 'None', 'x̀', '\x7f', '\x80', '𝟘', 'ℕ', 'Ⅰ', 'ⅰ', 'ª', 'ʰ', 'Ⅰb', 'Ⓐ', 'ⓐ']
+const predicateSamples = [
+    '',
+    'abc',
+    'ABC',
+    'Abc',
+    'aBC',
+    'Hello World',
+    'Hello world',
+    'HELLO',
+    'hello 1',
+    '123',
+    '١٢٣',
+    '²',
+    '½',
+    'Ⅻ',
+    '一二三',
+    '①',
+    '12a',
+    ' ',
+    '\t\n',
+    '\x1c',
+    '\x1f',
+    '​',
+    '\xa0',
+    'abc_1',
+    '_',
+    '1abc',
+    'é',
+    'ǅ',
+    'ǅa',
+    'Ǆa',
+    'ǆ',
+    'a ǅ',
+    'This Is',
+    'This is',
+    "They'Re",
+    'A1B',
+    'a1b',
+    '1',
+    'ß',
+    'ΣΑΣ',
+    'Σας',
+    '́',
+    'á',
+    'Ab Cd',
+    'AB CD',
+    '😀',
+    'a😀',
+    'if',
+    'None',
+    'x̀',
+    '\x7f',
+    '\x80',
+    '𝟘',
+    'ℕ',
+    'Ⅰ',
+    'ⅰ',
+    'ª',
+    'ʰ',
+    'Ⅰb',
+    'Ⓐ',
+    'ⓐ',
+]
 for (const s of predicateSamples) {
-    for (const fn of ['isdigit', 'isdecimal', 'isnumeric', 'isalpha', 'isalnum', 'isspace', 'isupper', 'islower', 'istitle', 'isidentifier', 'isascii']) {
+    for (const fn of [
+        'isdigit',
+        'isdecimal',
+        'isnumeric',
+        'isalpha',
+        'isalnum',
+        'isspace',
+        'isupper',
+        'islower',
+        'istitle',
+        'isidentifier',
+        'isascii',
+    ]) {
         method(fn, s)
     }
 }
 for (let i = 0; i < 300; i++) {
     const s = randomString(5)
-    method(r.pick(['isdigit', 'isdecimal', 'isnumeric', 'isalpha', 'isalnum', 'isspace', 'isupper', 'islower', 'istitle', 'isidentifier', 'isascii']), s)
+    method(
+        r.pick([
+            'isdigit',
+            'isdecimal',
+            'isnumeric',
+            'isalpha',
+            'isalnum',
+            'isspace',
+            'isupper',
+            'islower',
+            'istitle',
+            'isidentifier',
+            'isascii',
+        ]),
+        s,
+    )
 }
 pair('isdigit(5)', 'str.isdigit(5)')
 pair('isupper(null)', 'str.isupper(None)')
 
 // error messages, not just exception types
 const message = (jsExpr, pyExpr) =>
-    pair(`try { ${jsExpr}; return 'no error' } catch (e) { return [e.name, e.message] }`,
-        `try:\n    ${pyExpr}\n    result = 'no error'\nexcept Exception as e:\n    result = [type(e).__name__, str(e)]`)
+    pair(
+        `try { ${jsExpr}; return 'no error' } catch (e) { return [e.name, e.message] }`,
+        `try:\n    ${pyExpr}\n    result = 'no error'\nexcept Exception as e:\n    result = [type(e).__name__, str(e)]`,
+    )
 for (const [jsExpr, pyExpr] of [
-    ["split('a', '')", "'a'.split('')"], ["rsplit('a', 1)", "'a'.rsplit(1)"], ["partition('a', '')", "'a'.partition('')"],
-    ["rpartition('a', 5)", "'a'.rpartition(5)"], ["center('a', 5, 'ab')", "'a'.center(5, 'ab')"], ["ljust('a', 5, 5)", "'a'.ljust(5, 5)"],
-    ["startswith('a', 5)", "'a'.startswith(5)"], ["endswith('a', ['a', 5])", "'a'.endswith(('a', 5))"], ["find('a', 5)", "'a'.find(5)"],
-    ["rindex('a', 'b')", "'a'.rindex('b')"], ["replace('a', 'a', 5)", "'a'.replace('a', 5)"], ["strip('a', 5)", "'a'.strip(5)"],
-    ["join(',', [1])", "','.join([1])"], ["join(',', ['a', 'b', null])", "','.join(['a', 'b', None])"], ["zfill('a', 1.5)", "'a'.zfill(1.5)"],
-    ["removeprefix('a', 5)", "'a'.removeprefix(5)"], ["startswith('a', 'a', 1.5)", "'a'.startswith('a', 1.5)"],
+    ["split('a', '')", "'a'.split('')"],
+    ["rsplit('a', 1)", "'a'.rsplit(1)"],
+    ["partition('a', '')", "'a'.partition('')"],
+    ["rpartition('a', 5)", "'a'.rpartition(5)"],
+    ["center('a', 5, 'ab')", "'a'.center(5, 'ab')"],
+    ["ljust('a', 5, 5)", "'a'.ljust(5, 5)"],
+    ["startswith('a', 5)", "'a'.startswith(5)"],
+    ["endswith('a', ['a', 5])", "'a'.endswith(('a', 5))"],
+    ["find('a', 5)", "'a'.find(5)"],
+    ["rindex('a', 'b')", "'a'.rindex('b')"],
+    ["replace('a', 'a', 5)", "'a'.replace('a', 5)"],
+    ["strip('a', 5)", "'a'.strip(5)"],
+    ["join(',', [1])", "','.join([1])"],
+    ["join(',', ['a', 'b', null])", "','.join(['a', 'b', None])"],
+    ["zfill('a', 1.5)", "'a'.zfill(1.5)"],
+    ["removeprefix('a', 5)", "'a'.removeprefix(5)"],
+    ["startswith('a', 'a', 1.5)", "'a'.startswith('a', 1.5)"],
 ]) {
     message(jsExpr, pyExpr)
 }

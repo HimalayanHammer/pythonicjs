@@ -21,8 +21,14 @@ pair('functools.reduce((a, b) => a + b, [7])', 'functools.reduce(lambda a, b: a 
 
 // partial
 pair('functools.partial((a, b, c) => [a, b, c], 1)(2, 3)', 'functools.partial(lambda a, b, c: [a, b, c], 1)(2, 3)')
-pair('functools.partial(functools.partial((a, b, c) => [a, b, c], 1), 2)(3)', 'functools.partial(functools.partial(lambda a, b, c: [a, b, c], 1), 2)(3)')
-pair('functools.partial(functools.partial((a, b, c) => [a, b, c], 1), 2).args', 'functools.partial(functools.partial(lambda a, b, c: [a, b, c], 1), 2).args')
+pair(
+    'functools.partial(functools.partial((a, b, c) => [a, b, c], 1), 2)(3)',
+    'functools.partial(functools.partial(lambda a, b, c: [a, b, c], 1), 2)(3)',
+)
+pair(
+    'functools.partial(functools.partial((a, b, c) => [a, b, c], 1), 2).args',
+    'functools.partial(functools.partial(lambda a, b, c: [a, b, c], 1), 2).args',
+)
 pair('functools.partial(Math.max, 5)(1, 9)', 'functools.partial(max, 5)(1, 9)')
 
 // lru_cache: random call sequences, comparing which calls ran and the statistics
@@ -79,8 +85,14 @@ for (let i = 0; i < 40; i++) {
     const jsCmp = '(a, b) => (a % 10) - (b % 10) || b - a'
     const pyCmp = 'lambda a, b: (a % 10) - (b % 10) or b - a'
     pair(`sorted(${js(xs)}, {key: functools.cmp_to_key(${jsCmp})})`, `sorted(${py(xs)}, key=functools.cmp_to_key(${pyCmp}))`)
-    pair(`heapq.nsmallest(3, ${js(xs)}, functools.cmp_to_key(${jsCmp}))`, `heapq.nsmallest(3, ${py(xs)}, key=functools.cmp_to_key(${pyCmp}))`)
-    pair(`heapq.nlargest(4, ${js(xs)}, functools.cmp_to_key((a, b) => (a % 3) - (b % 3)))`, `heapq.nlargest(4, ${py(xs)}, key=functools.cmp_to_key(lambda a, b: (a % 3) - (b % 3)))`)
+    pair(
+        `heapq.nsmallest(3, ${js(xs)}, functools.cmp_to_key(${jsCmp}))`,
+        `heapq.nsmallest(3, ${py(xs)}, key=functools.cmp_to_key(${pyCmp}))`,
+    )
+    pair(
+        `heapq.nlargest(4, ${js(xs)}, functools.cmp_to_key((a, b) => (a % 3) - (b % 3)))`,
+        `heapq.nlargest(4, ${py(xs)}, key=functools.cmp_to_key(lambda a, b: (a % 3) - (b % 3)))`,
+    )
     if (xs.length) {
         pair(`max(${js(xs)}, {key: functools.cmp_to_key(${jsCmp})})`, `max(${py(xs)}, key=functools.cmp_to_key(${pyCmp}))`)
         pair(`min(${js(xs)}, {key: functools.cmp_to_key(${jsCmp})})`, `min(${py(xs)}, key=functools.cmp_to_key(${pyCmp}))`)

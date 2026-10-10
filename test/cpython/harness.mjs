@@ -23,7 +23,11 @@ export function findPython() {
 }
 
 export function runPython(python, snippets) {
-    const r = spawnSync(python, [join(here, 'runner.py')], {input: JSON.stringify(snippets), encoding: 'utf8', maxBuffer: 1 << 28})
+    const r = spawnSync(python, [join(here, 'runner.py')], {
+        input: JSON.stringify(snippets),
+        encoding: 'utf8',
+        maxBuffer: 1 << 28,
+    })
     if (r.status !== 0) {
         throw new Error(`python failed: ${r.stderr}`)
     }
@@ -33,8 +37,9 @@ export function runPython(python, snippets) {
 /** A fresh realm with the <script> build loaded, like a browser page. */
 export function createContext() {
     const context = vm.createContext({console})
-    const bundle = readFileSync(join(here, '..', '..', 'dist', 'pythonicjs.global.js'), 'utf8')
-    vm.runInContext(bundle, context)
+    const file = join(here, '..', '..', 'dist', 'pythonicjs.global.js')
+    // the filename lets coverage tools map this code back to src/ via the source map
+    vm.runInContext(readFileSync(file, 'utf8'), context, {filename: file})
     return context
 }
 
@@ -139,7 +144,9 @@ export function py(value) {
     if (Array.isArray(value)) {
         return `[${value.map(py).join(', ')}]`
     }
-    return `{${Object.entries(value).map(([k, v]) => `${JSON.stringify(k)}: ${py(v)}`).join(', ')}}`
+    return `{${Object.entries(value)
+        .map(([k, v]) => `${JSON.stringify(k)}: ${py(v)}`)
+        .join(', ')}}`
 }
 
 /** A JavaScript literal for a JSON-like JS value. */
@@ -163,7 +170,9 @@ export function js(value) {
         return `[${value.map(js).join(', ')}]`
     }
     if (value !== null && typeof value === 'object') {
-        return `{${Object.entries(value).map(([k, v]) => `${JSON.stringify(k)}: ${js(v)}`).join(', ')}}`
+        return `{${Object.entries(value)
+            .map(([k, v]) => `${JSON.stringify(k)}: ${js(v)}`)
+            .join(', ')}}`
     }
     return JSON.stringify(value)
 }

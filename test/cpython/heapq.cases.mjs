@@ -26,7 +26,12 @@ for (let n = 0; n < 250; n++) {
     const make = valueMaker(r.pick(['int', 'int', 'float', 'tuple', 'str']))
     const max = n % 3 === 0
     const initial = Array.from({length: r.int(0, 12)}, make)
-    const jsLines = [`const h = ${js(initial)}`, 'const out = []', `heapq.${max ? 'heapify_max' : 'heapify'}(h)`, 'out.push(h.slice())']
+    const jsLines = [
+        `const h = ${js(initial)}`,
+        'const out = []',
+        `heapq.${max ? 'heapify_max' : 'heapify'}(h)`,
+        'out.push(h.slice())',
+    ]
     const pyLines = [`h = ${py(initial)}`, 'out = []', `heapq.${max ? '_heapify_max' : 'heapify'}(h)`, 'out.append(list(h))']
     let size = initial.length
     for (let i = 0; i < r.int(1, 30); i++) {
@@ -60,7 +65,10 @@ for (let n = 0; n < 250; n++) {
 for (const size of [0, 1, 2, 3, 7, 8, 100, 3000]) {
     const xs = r.ints(size, 0, 50)
     pair(`(() => { const h = ${js(xs)}; heapq.heapify(h); return h })()`, `(lambda h: (heapq.heapify(h), h)[1])(${py(xs)})`)
-    pair(`(() => { const h = ${js(xs)}; heapq.heapify_max(h); return h })()`, `(lambda h: (heapq._heapify_max(h), h)[1])(${py(xs)})`)
+    pair(
+        `(() => { const h = ${js(xs)}; heapq.heapify_max(h); return h })()`,
+        `(lambda h: (heapq._heapify_max(h), h)[1])(${py(xs)})`,
+    )
 }
 
 // heap sort and errors

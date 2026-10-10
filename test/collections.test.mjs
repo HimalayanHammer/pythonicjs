@@ -1,5 +1,21 @@
 import {expect} from 'chai'
-import {bool, Counter, copy, collections, deepcopy, defaultdict, deque, equals, IndexError, KeyError, len, namedtuple, OrderedDict, sorted, ValueError} from 'pythonicjs'
+import {
+    bool,
+    Counter,
+    collections,
+    copy,
+    deepcopy,
+    defaultdict,
+    deque,
+    equals,
+    IndexError,
+    KeyError,
+    len,
+    namedtuple,
+    OrderedDict,
+    sorted,
+    ValueError,
+} from 'pythonicjs'
 import * as sub from 'pythonicjs/collections'
 
 describe('collections', () => {
@@ -12,7 +28,13 @@ describe('collections', () => {
         it('is a Map that counts', () => {
             const c = new Counter('abracadabra')
             expect(c).to.be.instanceOf(Map)
-            expect([...c]).to.deep.equal([['a', 5], ['b', 2], ['r', 2], ['c', 1], ['d', 1]])
+            expect([...c]).to.deep.equal([
+                ['a', 5],
+                ['b', 2],
+                ['r', 2],
+                ['c', 1],
+                ['d', 1],
+            ])
             expect(c.get('a')).to.equal(5)
             expect(len(c)).to.equal(5)
         })
@@ -32,7 +54,10 @@ describe('collections', () => {
 
         it('has most_common, elements, total, update and subtract', () => {
             const c = new Counter('aabbbc')
-            expect(c.most_common(2)).to.deep.equal([['b', 3], ['a', 2]])
+            expect(c.most_common(2)).to.deep.equal([
+                ['b', 3],
+                ['a', 2],
+            ])
             expect([...c.elements()]).to.deep.equal(['a', 'a', 'b', 'b', 'b', 'c'])
             expect(c.total()).to.equal(6)
             c.subtract('cccc')
@@ -201,7 +226,11 @@ describe('collections', () => {
 
     describe('OrderedDict', () => {
         it('moves keys and pops items from either end', () => {
-            const od = new OrderedDict([['a', 1], ['b', 2], ['c', 3]])
+            const od = new OrderedDict([
+                ['a', 1],
+                ['b', 2],
+                ['c', 3],
+            ])
             od.move_to_end('a')
             expect([...od.keys()]).to.deep.equal(['b', 'c', 'a'])
             od.move_to_end('a', false)
@@ -216,7 +245,15 @@ describe('collections', () => {
         it('is order-sensitive only against another OrderedDict', () => {
             const a = new OrderedDict({x: 1, y: 2})
             expect(equals(a, new OrderedDict({y: 2, x: 1}))).to.equal(false)
-            expect(equals(a, new Map([['y', 2], ['x', 1]]))).to.equal(true)
+            expect(
+                equals(
+                    a,
+                    new Map([
+                        ['y', 2],
+                        ['x', 1],
+                    ]),
+                ),
+            ).to.equal(true)
             expect(a.__repr__()).to.equal("OrderedDict({'x': 1, 'y': 2})")
         })
     })

@@ -44,8 +44,10 @@ for (let i = 0; i < 25; i++) {
 }
 same("itertools.islice(itertools.cycle('abc'), 8)")
 same('itertools.cycle(5)')
-pair('const it = iter([1, 2, 3]); const c = itertools.cycle(it); next(c); next(it, null); return list(itertools.islice(c, 6))',
-    'it = iter([1, 2, 3]); c = itertools.cycle(it); next(c); next(it, None); result = list(itertools.islice(c, 6))')
+pair(
+    'const it = iter([1, 2, 3]); const c = itertools.cycle(it); next(c); next(it, null); return list(itertools.islice(c, 6))',
+    'it = iter([1, 2, 3]); c = itertools.cycle(it); next(c); next(it, None); result = list(itertools.islice(c, 6))',
+)
 
 // --- repeat -----------------------------------------------------------------
 for (const n of [-2, -1, 0, 1, 3]) {
@@ -64,7 +66,10 @@ for (let i = 0; i < 40; i++) {
     const init = r.int(-5, 5)
     pair(`itertools.accumulate(${js(xs)}, null, {initial: ${init}})`, `itertools.accumulate(${py(xs)}, None, initial=${init})`)
     pair(`itertools.accumulate(${js(xs)}, {initial: ${init}})`, `itertools.accumulate(${py(xs)}, initial=${init})`)
-    pair(`itertools.accumulate(${js(xs)}, (a, b) => a - b, ${init})`, `itertools.accumulate(${py(xs)}, lambda a, b: a - b, initial=${init})`)
+    pair(
+        `itertools.accumulate(${js(xs)}, (a, b) => a - b, ${init})`,
+        `itertools.accumulate(${py(xs)}, lambda a, b: a - b, initial=${init})`,
+    )
 }
 same("itertools.accumulate('abc')")
 same('itertools.accumulate([[1], [2, 3], []])')
@@ -73,7 +78,10 @@ pair('itertools.accumulate([1, 2], null, {initial: null})', 'itertools.accumulat
 pair('itertools.accumulate([], {initial: 3})', 'itertools.accumulate([], initial=3)')
 same("itertools.accumulate([1, 'a'])")
 same('itertools.accumulate(3)')
-pair("itertools.accumulate([1, 2], (acc, x) => acc + String(x), '')", "itertools.accumulate([1, 2], lambda acc, x: acc + str(x), initial='')")
+pair(
+    "itertools.accumulate([1, 2], (acc, x) => acc + String(x), '')",
+    "itertools.accumulate([1, 2], lambda acc, x: acc + str(x), initial='')",
+)
 
 // --- batched ------------------------------------------------------------------
 for (let i = 0; i < 50; i++) {
@@ -85,9 +93,14 @@ for (let i = 0; i < 50; i++) {
 same("itertools.batched('abcdefg', 3)")
 same('itertools.batched([1, 2], 1.5)')
 same('itertools.batched(5, 2)')
-pair('itertools.islice(itertools.batched(itertools.count(), 3), 2)', 'itertools.islice(itertools.batched(itertools.count(), 3), 2)')
-pair('const out = []; try { for (const b of itertools.batched([1, 2, 3, 4, 5], 2, {strict: true})) out.push(b) } catch (e) { out.push(e.name) } return out',
-    'out = []\ntry:\n    for b in itertools.batched([1, 2, 3, 4, 5], 2, strict=True): out.append(b)\nexcept Exception as e:\n    out.append(type(e).__name__)\nresult = out')
+pair(
+    'itertools.islice(itertools.batched(itertools.count(), 3), 2)',
+    'itertools.islice(itertools.batched(itertools.count(), 3), 2)',
+)
+pair(
+    'const out = []; try { for (const b of itertools.batched([1, 2, 3, 4, 5], 2, {strict: true})) out.push(b) } catch (e) { out.push(e.name) } return out',
+    'out = []\ntry:\n    for b in itertools.batched([1, 2, 3, 4, 5], 2, strict=True): out.append(b)\nexcept Exception as e:\n    out.append(type(e).__name__)\nresult = out',
+)
 
 // --- chain --------------------------------------------------------------------
 for (let i = 0; i < 25; i++) {
@@ -121,12 +134,17 @@ for (let i = 0; i < 50; i++) {
     pair(`itertools.filterfalse(${jp}, ${js(xs)})`, `itertools.filterfalse(${pp}, ${py(xs)})`)
     pair(`itertools.filterfalse(null, ${js(xs)})`, `itertools.filterfalse(None, ${py(xs)})`)
     // what is left of a shared iterator afterwards
-    pair(`const it = iter(${js(xs)}); const a = list(itertools.takewhile(${jp}, it)); return [a, list(it)]`,
-        `it = iter(${py(xs)}); a = list(itertools.takewhile(${pp}, it)); result = [a, list(it)]`)
+    pair(
+        `const it = iter(${js(xs)}); const a = list(itertools.takewhile(${jp}, it)); return [a, list(it)]`,
+        `it = iter(${py(xs)}); a = list(itertools.takewhile(${pp}, it)); result = [a, list(it)]`,
+    )
 }
 pair("itertools.filterfalse(null, [0, '', [], 'a', [0], null])", "itertools.filterfalse(None, [0, '', [], 'a', [0], None])")
 pair('itertools.takewhile(null, 5)', 'itertools.takewhile(None, 5)')
-pair('itertools.islice(itertools.dropwhile((x) => x < 5, itertools.count()), 3)', 'itertools.islice(itertools.dropwhile(lambda x: x < 5, itertools.count()), 3)')
+pair(
+    'itertools.islice(itertools.dropwhile((x) => x < 5, itertools.count()), 3)',
+    'itertools.islice(itertools.dropwhile(lambda x: x < 5, itertools.count()), 3)',
+)
 pair('itertools.takewhile((x) => x < 5, itertools.count())', 'itertools.takewhile(lambda x: x < 5, itertools.count())')
 
 // --- groupby --------------------------------------------------------------------
@@ -139,16 +157,28 @@ const keys = [
 for (let i = 0; i < 60; i++) {
     const xs = r.ints(r.int(0, 10), -2, 2).sort((a, b) => (r.next() < 0.6 ? a - b : 0))
     const [jk, pk] = r.pick(keys)
-    pair(`Array.from(itertools.groupby(${js(xs)}, ${jk}), ([k, g]) => [k, list(g)])`,
-        `[[k, list(g)] for k, g in itertools.groupby(${py(xs)}, ${pk})]`)
-    pair(`Array.from(itertools.groupby(${js(xs)}), ([k, g]) => [k, list(g)])`,
-        `[[k, list(g)] for k, g in itertools.groupby(${py(xs)})]`)
+    pair(
+        `Array.from(itertools.groupby(${js(xs)}, ${jk}), ([k, g]) => [k, list(g)])`,
+        `[[k, list(g)] for k, g in itertools.groupby(${py(xs)}, ${pk})]`,
+    )
+    pair(
+        `Array.from(itertools.groupby(${js(xs)}), ([k, g]) => [k, list(g)])`,
+        `[[k, list(g)] for k, g in itertools.groupby(${py(xs)})]`,
+    )
     pair(`list(itertools.groupby(${js(xs)}, ${jk})).map(([k]) => k)`, `[k for k, g in itertools.groupby(${py(xs)}, ${pk})]`)
 }
-pair("Array.from(itertools.groupby('AAAABBBCCDAABBB'), ([k, g]) => [k, list(g)])", "[[k, list(g)] for k, g in itertools.groupby('AAAABBBCCDAABBB')]")
-pair('Array.from(itertools.groupby([1, true, 1, 0, false]), ([k, g]) => [k, list(g)])', '[[k, list(g)] for k, g in itertools.groupby([1, True, 1, 0, False])]')
-pair("Array.from(itertools.groupby([[1, 'a'], [1, 'b'], [2, 'c']], (p) => p[0]), ([k, g]) => [k, list(g)])",
-    "[[k, list(g)] for k, g in itertools.groupby([(1, 'a'), (1, 'b'), (2, 'c')], lambda p: p[0])]")
+pair(
+    "Array.from(itertools.groupby('AAAABBBCCDAABBB'), ([k, g]) => [k, list(g)])",
+    "[[k, list(g)] for k, g in itertools.groupby('AAAABBBCCDAABBB')]",
+)
+pair(
+    'Array.from(itertools.groupby([1, true, 1, 0, false]), ([k, g]) => [k, list(g)])',
+    '[[k, list(g)] for k, g in itertools.groupby([1, True, 1, 0, False])]',
+)
+pair(
+    "Array.from(itertools.groupby([[1, 'a'], [1, 'b'], [2, 'c']], (p) => p[0]), ([k, g]) => [k, list(g)])",
+    "[[k, list(g)] for k, g in itertools.groupby([(1, 'a'), (1, 'b'), (2, 'c')], lambda p: p[0])]",
+)
 same('itertools.groupby(5)')
 // scripts that interleave the outer iterator with the groups; they also log
 // every key call and what is left of the source, so consumption must match
@@ -169,8 +199,12 @@ for (let i = 0; i < 250; i++) {
     const steps = r.int(1, 16)
     for (let k = 0; k < steps; k++) {
         if (r.next() < 0.4) {
-            jsLines.push("{ const x = next(gb, null); if (x === null) { out.push('END') } else { groups.push(x[1]); out.push(['key', x[0]]) } }")
-            pyLines.push("x = next(gb, None)\nif x is None: out.append('END')\nelse: groups.append(x[1]); out.append(['key', x[0]])")
+            jsLines.push(
+                "{ const x = next(gb, null); if (x === null) { out.push('END') } else { groups.push(x[1]); out.push(['key', x[0]]) } }",
+            )
+            pyLines.push(
+                "x = next(gb, None)\nif x is None: out.append('END')\nelse: groups.append(x[1]); out.append(['key', x[0]])",
+            )
         } else {
             const g = r.int(0, 3)
             jsLines.push(`out.push(${g} < groups.length ? next(groups[${g}], 'END') : 'NOGROUP')`)
@@ -181,8 +215,10 @@ for (let i = 0; i < 250; i++) {
     pyLines.push('out.extend([calls[:], list(src), [list(g) for g in groups]]); result = out')
     pair(jsLines.join('\n'), pyLines.join('\n'))
 }
-pair("const gb = itertools.groupby('aabbb'); const [, g1] = next(gb); next(g1); const [, g2] = next(gb); return [list(g1), list(g2)]",
-    "gb = itertools.groupby('aabbb'); _, g1 = next(gb); next(g1); _, g2 = next(gb); result = [list(g1), list(g2)]")
+pair(
+    "const gb = itertools.groupby('aabbb'); const [, g1] = next(gb); next(g1); const [, g2] = next(gb); return [list(g1), list(g2)]",
+    "gb = itertools.groupby('aabbb'); _, g1 = next(gb); next(g1); _, g2 = next(gb); result = [list(g1), list(g2)]",
+)
 
 // --- islice -----------------------------------------------------------------------
 const sliceArg = () => r.pick([null, null, r.int(0, 12), r.int(0, 12), r.int(-3, -1), 1.5, true])
@@ -201,10 +237,15 @@ for (let i = 0; i < 120; i++) {
     if (finite[nargs === 1 ? 0 : 1] === null) {
         finite[nargs === 1 ? 0 : 1] = 50
     }
-    pair(`itertools.islice(itertools.count(), ${finite.map(js).join(', ')})`, `itertools.islice(itertools.count(), ${finite.map(py).join(', ')})`)
+    pair(
+        `itertools.islice(itertools.count(), ${finite.map(js).join(', ')})`,
+        `itertools.islice(itertools.count(), ${finite.map(py).join(', ')})`,
+    )
     // consumption of a shared iterator
-    pair(`const it = iter(range(15)); const a = list(itertools.islice(it, ${jsArgs})); return [a, list(it)]`,
-        `it = iter(range(15)); a = list(itertools.islice(it, ${pyArgs})); result = [a, list(it)]`)
+    pair(
+        `const it = iter(range(15)); const a = list(itertools.islice(it, ${jsArgs})); return [a, list(it)]`,
+        `it = iter(range(15)); a = list(itertools.islice(it, ${pyArgs})); result = [a, list(it)]`,
+    )
 }
 // the cases from the CPython docs and tests
 for (const args of ['2', '2, 4', '2, null', '0, null, 2', '5, 3', '1, 10, 3', '3, 3', 'null', 'null, null, null']) {
@@ -217,10 +258,14 @@ same('itertools.islice([1, 2, 3], 0, 2, 0)')
 same('itertools.islice(5, 2)')
 pair('itertools.islice(5, -1)', 'itertools.islice(5, -1)')
 pair('itertools.islice([1, 2, 3], 2 ** 64)', 'itertools.islice([1, 2, 3], 2 ** 64)')
-pair('const it = iter(range(10)); list(itertools.islice(it, 5, 3)); return list(it)',
-    'it = iter(range(10)); list(itertools.islice(it, 5, 3)); result = list(it)')
-pair('const it = iter(range(10)); const s = itertools.islice(it, 1, 7, 3); return [next(s), list(it)]',
-    'it = iter(range(10)); s = itertools.islice(it, 1, 7, 3); result = [next(s), list(it)]')
+pair(
+    'const it = iter(range(10)); list(itertools.islice(it, 5, 3)); return list(it)',
+    'it = iter(range(10)); list(itertools.islice(it, 5, 3)); result = list(it)',
+)
+pair(
+    'const it = iter(range(10)); const s = itertools.islice(it, 1, 7, 3); return [next(s), list(it)]',
+    'it = iter(range(10)); s = itertools.islice(it, 1, 7, 3); result = [next(s), list(it)]',
+)
 
 // --- pairwise -----------------------------------------------------------------------
 for (let i = 0; i < 20; i++) {
@@ -237,7 +282,10 @@ for (let i = 0; i < 60; i++) {
     const pyPools = pools.map(py).join(', ')
     same(`itertools.product(${jsPools})`)
     const rep = r.int(-1, 3)
-    pair(`itertools.product(${jsPools}${pools.length ? ', ' : ''}{repeat: ${rep}})`, `itertools.product(${pyPools}${pools.length ? ', ' : ''}repeat=${rep})`)
+    pair(
+        `itertools.product(${jsPools}${pools.length ? ', ' : ''}{repeat: ${rep}})`,
+        `itertools.product(${pyPools}${pools.length ? ', ' : ''}repeat=${rep})`,
+    )
 }
 same("itertools.product('ABCD', 'xy')")
 pair('itertools.product(range(2), {repeat: 3})', 'itertools.product(range(2), repeat=3)')
@@ -272,7 +320,10 @@ same('itertools.combinations_with_replacement([1], -1)')
 pair('len(list(itertools.permutations(range(6))))', 'len(list(itertools.permutations(range(6))))')
 pair('list(itertools.permutations(range(5), 3))', 'list(itertools.permutations(range(5), 3))')
 pair('len(list(itertools.combinations(range(12), 5)))', 'len(list(itertools.combinations(range(12), 5)))')
-pair('len(list(itertools.combinations_with_replacement(range(6), 4)))', 'len(list(itertools.combinations_with_replacement(range(6), 4)))')
+pair(
+    'len(list(itertools.combinations_with_replacement(range(6), 4)))',
+    'len(list(itertools.combinations_with_replacement(range(6), 4)))',
+)
 
 // --- starmap --------------------------------------------------------------------------
 for (let i = 0; i < 15; i++) {
@@ -307,7 +358,10 @@ same('itertools.tee([1, 2], -1)')
 same('itertools.tee(5)')
 same('len(itertools.tee("abc", 3))')
 pair("itertools.tee('abc').map((t) => list(t))", "[list(t) for t in itertools.tee('abc')]")
-pair('itertools.tee(itertools.count(), 2).map((t) => list(itertools.islice(t, 3)))', '[list(itertools.islice(t, 3)) for t in itertools.tee(itertools.count(), 2)]')
+pair(
+    'itertools.tee(itertools.count(), 2).map((t) => list(itertools.islice(t, 3)))',
+    '[list(itertools.islice(t, 3)) for t in itertools.tee(itertools.count(), 2)]',
+)
 
 // --- zip_longest ----------------------------------------------------------------------
 for (let i = 0; i < 50; i++) {
@@ -316,14 +370,18 @@ for (let i = 0; i < 50; i++) {
     const pyLists = lists.map(py).join(', ')
     same(`itertools.zip_longest(${jsLists})`)
     const fill = r.pick([0, -1, 'x', null, [1]])
-    pair(`itertools.zip_longest(${jsLists}${lists.length ? ', ' : ''}{fillvalue: ${js(fill)}})`,
-        `itertools.zip_longest(${pyLists}${lists.length ? ', ' : ''}fillvalue=${py(fill)})`)
+    pair(
+        `itertools.zip_longest(${jsLists}${lists.length ? ', ' : ''}{fillvalue: ${js(fill)}})`,
+        `itertools.zip_longest(${pyLists}${lists.length ? ', ' : ''}fillvalue=${py(fill)})`,
+    )
 }
 pair("itertools.zip_longest('ABCD', 'xy', {fillvalue: '-'})", "itertools.zip_longest('ABCD', 'xy', fillvalue='-')")
 same('itertools.zip_longest([1], 2)')
 same('itertools.islice(itertools.zip_longest(itertools.count(), [1, 2]), 4)')
-pair('const a = iter([1, 2, 3]); const b = iter([1]); const z = itertools.zip_longest(a, b); next(z); next(z); return [list(z), list(a), list(b)]',
-    'a = iter([1, 2, 3]); b = iter([1]); z = itertools.zip_longest(a, b); next(z); next(z); result = [list(z), list(a), list(b)]')
+pair(
+    'const a = iter([1, 2, 3]); const b = iter([1]); const z = itertools.zip_longest(a, b); next(z); next(z); return [list(z), list(a), list(b)]',
+    'a = iter([1, 2, 3]); b = iter([1]); z = itertools.zip_longest(a, b); next(z); next(z); result = [list(z), list(a), list(b)]',
+)
 
 // --- recipes, checked against the code in the itertools documentation -----------------
 const RECIPES = `
@@ -393,7 +451,7 @@ for (let i = 0; i < 40; i++) {
     recipe(`itertools.quantify(${js(xs)})`, `quantify(${py(xs)})`)
     recipe(`itertools.quantify(${js(xs)}, (x) => x > ${t})`, `quantify(${py(xs)}, lambda x: x > ${t})`)
 }
-recipe("itertools.take(3, itertools.count(10))", 'take(3, count(10))')
+recipe('itertools.take(3, itertools.count(10))', 'take(3, count(10))')
 recipe('itertools.nth(itertools.count(), 1000)', 'nth(count(), 1000)')
 recipe("itertools.unique_everseen('AAAABBBCCDAABBB')", "unique_everseen('AAAABBBCCDAABBB')")
 recipe("itertools.unique_everseen('ABBcCAD', (s) => s.toLowerCase())", "unique_everseen('ABBcCAD', str.lower)")

@@ -12,7 +12,11 @@ const NO_INITIAL = Symbol('NO_INITIAL')
  */
 export function reduce<T>(fn: (accumulator: T, item: T) => T, iterable: Iterable<T>): T
 export function reduce<T, A>(fn: (accumulator: A, item: T) => A, iterable: Iterable<T>, initial: A): A
-export function reduce(fn: (accumulator: unknown, item: unknown) => unknown, iterable: Iterable<unknown>, ...rest: unknown[]): unknown {
+export function reduce(
+    fn: (accumulator: unknown, item: unknown) => unknown,
+    iterable: Iterable<unknown>,
+    ...rest: unknown[]
+): unknown {
     if (!isIterable(iterable)) {
         throw new TypeError(`reduce() arg 2 must support iteration`)
     }
@@ -39,7 +43,10 @@ export interface PartialFunction<A extends unknown[], B extends unknown[], R> {
  * fn with its first arguments fixed: partial(Math.pow, 2)(10) is 1024. The
  * result has .func and .args, and partials of partials are flattened like Python's.
  */
-export function partial<A extends unknown[], B extends unknown[], R>(fn: (...args: [...A, ...B]) => R, ...args: A): PartialFunction<A, B, R> {
+export function partial<A extends unknown[], B extends unknown[], R>(
+    fn: (...args: [...A, ...B]) => R,
+    ...args: A
+): PartialFunction<A, B, R> {
     if (typeof fn !== 'function') {
         throw new TypeError('the first argument must be callable')
     }
@@ -133,7 +140,9 @@ function makeKey(x: unknown): string {
 function callKey(self: unknown, args: unknown[]): string {
     const keys = args.map(makeKey).join(',')
     // methods are cached per instance, like Python where self is an argument
-    return self !== undefined && self !== null && self !== globalThis && (typeof self === 'object' || typeof self === 'function') ? `${makeKey(self)}|${keys}` : keys
+    return self !== undefined && self !== null && self !== globalThis && (typeof self === 'object' || typeof self === 'function')
+        ? `${makeKey(self)}|${keys}`
+        : keys
 }
 
 function memoize<F extends (...args: any[]) => any>(fn: F, maxsize: number | null): CachedFunction<F> {

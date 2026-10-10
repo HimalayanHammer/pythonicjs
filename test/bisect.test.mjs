@@ -27,14 +27,22 @@ describe('bisect', () => {
     })
 
     it('applies key to items but not to x when searching', () => {
-        const people = [['ann', 20], ['bob', 30], ['cy', 30], ['dee', 40]]
+        const people = [
+            ['ann', 20],
+            ['bob', 30],
+            ['cy', 30],
+            ['dee', 40],
+        ]
         const age = (p) => p[1]
         expect(bisect_left(people, 30, 0, null, age)).to.equal(1)
         expect(bisect_right(people, 30, {key: age})).to.equal(3)
     })
 
     it('applies key to x when inserting', () => {
-        const people = [['ann', 20], ['bob', 30]]
+        const people = [
+            ['ann', 20],
+            ['bob', 30],
+        ]
         insort_left(people, ['eve', 30], {key: (p) => p[1]})
         insort_right(people, ['fay', 30], 0, undefined, (p) => p[1])
         expect(people.map((p) => p[0])).to.deep.equal(['ann', 'eve', 'bob', 'fay'])
@@ -46,8 +54,15 @@ describe('bisect', () => {
             insort(a, x)
         }
         expect(a).to.deep.equal(['B', 'a', 'b', 'é'])
-        const t = [[1, 'a'], [2, 'b']]
+        const t = [
+            [1, 'a'],
+            [2, 'b'],
+        ]
         insort(t, [1, 'b'])
-        expect(t).to.deep.equal([[1, 'a'], [1, 'b'], [2, 'b']])
+        expect(t).to.deep.equal([
+            [1, 'a'],
+            [1, 'b'],
+            [2, 'b'],
+        ])
     })
 })
