@@ -1,22 +1,24 @@
-import * as builtins from './builtins.js'
 import * as bisect from './bisect.js'
+import * as builtins from './builtins.js'
 import * as collections from './collections.js'
 import * as errors from './errors.js'
 import * as format from './format.js'
 import * as functools from './functools.js'
 import * as heapq from './heapq.js'
 import * as itertools from './itertools.js'
-import {Range, range} from './range.js'
+import {range} from './range.js'
 import * as strings from './strings.js'
 
-/** Everything that install() puts on the target, by name. */
+/**
+ * Everything that install() puts on the target, by name. The Range class is
+ * left out on purpose: it would replace the DOM's own Range in browsers.
+ */
 export const api: Record<string, unknown> = {
     ...builtins,
     ...strings,
     ...format,
     ...errors,
     ...collections,
-    Range,
     range,
     collections,
     itertools,
