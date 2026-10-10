@@ -11,8 +11,8 @@ rmSync(dist, {recursive: true, force: true})
 const entryPoints = readdirSync('src').filter((f) => f.endsWith('.ts')).map((f) => join('src', f))
 
 // one output file per source file, so the subpath exports share modules
-await build({entryPoints, outdir: `${dist}/esm`, format: 'esm', target: 'es2022', sourcemap: true})
-await build({entryPoints, outdir: `${dist}/cjs`, format: 'cjs', target: 'es2022', sourcemap: true})
+await build({entryPoints, outdir: `${dist}/esm`, format: 'esm', target: 'es2022', sourcemap: true, keepNames: true})
+await build({entryPoints, outdir: `${dist}/cjs`, format: 'cjs', target: 'es2022', sourcemap: true, keepNames: true})
 writeFileSync(`${dist}/cjs/package.json`, '{"type": "commonjs"}\n')
 
 // type declarations (tsc also type-checks the source)
@@ -28,7 +28,7 @@ const lines = Object.keys(api)
     )
 writeFileSync(
     `${dist}/esm/global.d.ts`,
-    `import type * as py from './index.js'\n\ndeclare global {\n${lines.join('\n')}\n    var pythonicjs: typeof py\n}\n\nexport * from './index.js'\n`,
+    `import type * as py from './index.js'\n\ndeclare global {\n${lines.join('\n')}\n    var pythonicjs: Omit<typeof py, 'Range' | 'install'>\n}\n\nexport * from './index.js'\n`,
 )
 
 for (const file of readdirSync(`${dist}/esm`).filter((f) => f.endsWith('.d.ts'))) {
@@ -44,6 +44,7 @@ for (const minify of [false, true]) {
         format: 'iife',
         target: 'es2020',
         minify,
+        keepNames: true,
         sourcemap: true,
     })
 }

@@ -1067,6 +1067,10 @@ export function is_empty(object: unknown): boolean {
 
 /** A shallow copy of an array, object (keeping its class), Date, Map, Set or typed array. */
 export function copy<T>(object: T): T {
+    const custom = (object as {__copy__?: () => T} | null)?.__copy__
+    if (typeof custom === 'function') {
+        return custom.call(object)
+    }
     if (Array.isArray(object)) {
         return object.slice() as T
     }
@@ -1078,10 +1082,6 @@ export function copy<T>(object: T): T {
     }
     if (object === null || typeof object !== 'object') {
         return object
-    }
-    const custom = (object as {__copy__?: () => T}).__copy__
-    if (typeof custom === 'function') {
-        return custom.call(object)
     }
     if (object instanceof Date) {
         return new Date(object.getTime()) as T
@@ -1126,6 +1126,13 @@ export function deepcopy<T>(object: T, memo: Map<unknown, unknown> = new Map()):
             result.add(deepcopy(v, memo))
         }
         return result as T
+    }
+    const make = (object.constructor as {_make?: (items: Iterable<unknown>) => T})?._make
+    if (Array.isArray(object) && object.constructor !== Array && typeof make === 'function') {
+        // namedtuples are frozen, so build a new one from deep-copied fields
+        const result = make.call(object.constructor, object.map((item) => deepcopy(item, memo)))
+        memo.set(object, result)
+        return result
     }
     const result = Array.isArray(object) ? [] : Object.create(Object.getPrototypeOf(object))
     memo.set(object, result)
